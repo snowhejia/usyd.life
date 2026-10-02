@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="460" viewBox="0 0 1280 460" role="img" aria-labelledby="title desc">
+  <title id="title">悉大活动墙 · USYD EVENTS WALL</title>
+  <desc id="desc">蓝色方格背景、薄荷绿窗口栏与像素图标，收集悉尼大学活动、学生权益、生活提醒和美食。</desc>
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="2"/></pattern>
+    <symbol id="star" viewBox="0 0 32 32"><path d="M13 2h6v8h5v3h6v6h-6v3h-5v8h-6v-8H8v-3H2v-6h6v-3h5Z" fill="#f3d27f" stroke="#4c302b" stroke-width="2"/></symbol>
+    <symbol id="heart" viewBox="0 0 32 32"><path d="M3 7h3V4h7v3h6V4h7v3h3v12h-3v3h-3v3h-4v4h-6v-4H9v-3H6v-3H3Z" fill="#e79b8a" stroke="#4c302b" stroke-width="2"/></symbol>
+    <symbol id="note" viewBox="0 0 32 32"><path d="M6 2h15v5h5v23H6Z" fill="#fffdf8" stroke="#4c302b" stroke-width="2"/><path d="M21 2v7h5M10 14h11M10 19h11M10 24h8" fill="none" stroke="#4c302b" stroke-width="2"/></symbol>
+    <symbol id="bowl" viewBox="0 0 32 32"><path d="M3 14h26v6h-3v5h-5v4H11v-4H6v-5H3Z" fill="#83b8aa" stroke="#4c302b" stroke-width="2"/><path d="M4 15h24v4H4Z" fill="#f3d27f"/><path d="M11 2v4H8v5m14-9v4h-3v5" fill="none" stroke="#4c302b" stroke-width="2"/></symbol>
+  </defs>
+  <rect width="1280" height="460" fill="#d4e1f6"/>
+  <rect width="1280" height="460" fill="url(#grid)"/>
+  <g fill="#4c302b"><rect x="40" y="40" width="1210" height="386" rx="3"/><rect x="744" y="145" width="226" height="238" rx="2"/><rect x="990" y="145" width="226" height="238" rx="2"/></g>
+  <rect x="32" y="32" width="1210" height="386" rx="3" fill="#fffdf8" stroke="#4c302b" stroke-width="3"/>
+  <path d="M35 33H1239V80H35Z" fill="#83b8aa"/><path d="M33 81H1241" stroke="#4c302b" stroke-width="3"/>
+  <use href="#star" x="51" y="43" width="25" height="25"/>
+  <g fill="#4c302b" font-family="'SFMono-Regular',Consolas,monospace" font-weight="700">
+    <text x="92" y="62" font-size="18" letter-spacing="1.2">USYD.LIFE</text>
+    <text x="1183" y="63" font-size="21" letter-spacing="6">▪▪▪</text>
+  </g>
+  <g fill="#4c302b" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">
+    <text x="76" y="208" font-size="78" font-weight="750" letter-spacing="1">悉大活动墙</text>
+    <text x="80" y="250" font-size="21" font-family="'SFMono-Regular',Consolas,monospace" letter-spacing="4">USYD EVENTS WALL</text>
+    <text x="80" y="302" font-size="25" letter-spacing="3">活动 · 权益 · 提醒 · 美食</text>
+    <rect x="82" y="335" width="186" height="47" fill="#4c302b"/>
+    <rect x="77" y="330" width="186" height="47" fill="#f3d27f" stroke="#4c302b" stroke-width="2"/>
+    <text x="95" y="361" font-size="19" font-weight="600">打开 usyd.life</text>
+    <path d="M232 346h13v13m0-13-15 15" fill="none" stroke="#4c302b" stroke-width="2.5"/>
+  </g>
+  <!-- Miniature bento windows share the site's palette, square controls and hard shadows. -->
+  <g stroke="#4c302b" stroke-width="2.5">
+    <rect x="724" y="125" width="240" height="256" fill="#4c302b"/>
+    <rect x="718" y="119" width="240" height="256" fill="#fffdf8"/>
+    <path d="M719 120H957V158H719Z" fill="#83b8aa" stroke="none"/><path d="M719 158H957"/>
+    <rect x="987" y="125" width="212" height="116" fill="#4c302b"/>
+    <rect x="981" y="119" width="212" height="116" fill="#fffdf8"/>
+    <path d="M982 120H1192V151H982Z" fill="#f3d27f" stroke="none"/><path d="M982 151H1192"/>
+    <rect x="987" y="265" width="212" height="116" fill="#4c302b"/>
+    <rect x="981" y="259" width="212" height="116" fill="#fffdf8"/>
+    <path d="M982 260H1192V291H982Z" fill="#ecad86" stroke="none"/><path d="M982 291H1192"/>
+  </g>
+  <g fill="#4c302b" font-family="'SFMono-Regular',Consolas,monospace" font-size="13" font-weight="700" letter-spacing="1">
+    <text x="735" y="144">EVENTS</text><text x="927" y="143">▪</text>
+    <text x="996" y="141">PERKS</text><text x="1163" y="141">▪</text>
+    <text x="996" y="281">EATS + NOTICES</text><text x="1163" y="281">▪</text>
+  </g>
+  <g stroke="#4c302b" stroke-width="3" fill="#fffdf8">
+    <path d="M776 193h121v109H776Z"/><path d="M776 193h121v29H776Z" fill="#f3d27f"/>
+    <path d="M802 181v24m69-24v24" stroke-width="6"/>
+    <path d="M796 239h15v15h-15Zm28 0h15v15h-15Zm28 0h15v15h-15Zm-56 29h15v15h-15Zm28 0h15v15h-15Z" fill="#d4e1f6" stroke="none"/>
+    <path d="m850 275 9 9 21-24" fill="none" stroke="#83b8aa" stroke-width="8"/>
+  </g>
+  <use href="#star" x="885" y="177" width="35" height="35"/>
+  <use href="#heart" x="1005" y="174" width="37" height="37"/>
+  <use href="#bowl" x="1003" y="313" width="37" height="37"/>
+  <use href="#note" x="1153" y="316" width="26" height="31"/>
+  <g fill="#4c302b" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-weight="600">
+    <text x="838" y="346" text-anchor="middle" font-size="25">最近有什么活动？</text>
+    <text x="1057" y="203" font-size="24">学生权益</text>
+    <text x="1055" y="342" font-size="24">校园生活</text>
+  </g>
+  <path d="M642 294v49l13-12 12 22 10-6-12-20 17-2Z" fill="#ecad86" stroke="#4c302b" stroke-width="3" shape-rendering="crispEdges"/>
+</svg>
