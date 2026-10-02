@@ -1,12 +1,13 @@
 name: 投稿新活动
 description: 分享一场面向悉大学生的活动，维护者核实后收录。
 title: "[活动投稿] "
+labels: ["投稿"]
 body:
   - type: markdown
     attributes:
       value: |
         感谢你一起维护悉大活动墙。Issue 会公开展示，请不要提交私人联系方式。
-        提交并不代表已收录；维护者核对后会更新网站。
+        维护者审核通过后自动收录。
   - type: input
     id: event-title
     attributes:
@@ -44,7 +45,7 @@ body:
     id: dates
     attributes:
       label: 活动日期
-      description: 写明年份；多日活动请分别说明日期。
+      description: 格式 YYYY-MM-DD；多日活动填写 YYYY-MM-DD 至 YYYY-MM-DD。
       placeholder: "2026-10-06"
     validations:
       required: true
@@ -87,10 +88,20 @@ body:
       description: 附主办方链接、公开通知；可以拖入通知截图，请先遮去私人信息。
     validations:
       required: true
+  - type: input
+    id: expires-on
+    attributes:
+      label: 展示截止日期
+      description: 可选，格式 YYYY-MM-DD。当天结束后退出首页推荐，长期内容可留空。
+  - type: textarea
+    id: images
+    attributes:
+      label: 配图
+      description: 直接粘贴或拖入图片，最多 3 张、每张不超过 5 MB；第一张作为封面。请使用 PNG、JPG、GIF 或 WebP。
   - type: checkboxes
     id: confirmation
     attributes:
       label: 确认信息
       options:
-        - label: 以上信息可以公开展示，已附可核对的来源。
+        - label: 以上信息及配图可以公开展示，已附可核对的来源。
           required: true

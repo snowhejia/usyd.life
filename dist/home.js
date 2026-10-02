@@ -16,7 +16,7 @@ import {selectHomeResources} from './home-selection.js?v=1';
     if (item?.imagePosition) element.querySelector('img')?.style.setProperty('object-position',item.imagePosition);
   }
   const {today, benefit, notice: nextNotice, food} = selectHomeResources(data);
-  const upcoming = data.events.filter(item => (item.endDate || item.startDate) >= today).sort((a,b) => a.startDate.localeCompare(b.startDate));
+  const upcoming = data.events.filter(item => item.active !== false && (!item.expiresOn || item.expiresOn >= today) && (item.endDate || item.startDate) >= today).sort((a,b) => a.startDate.localeCompare(b.startDate));
   document.getElementById('home-event-count').textContent = String(upcoming.length).padStart(2,'0');
   document.getElementById('home-events').innerHTML = upcoming.slice(0,3).map(item => {
     const [,month,day] = item.startDate.split('-');

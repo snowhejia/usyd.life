@@ -101,3 +101,7 @@ Free Gelato 卡片采用原创文字排版；首页轮播配有项目内绘制�
 - 地址与菜品于 2026-10-03 核对自 [Kura Ichi (Haymarket) 店铺菜单](https://www.ubereats.com/au/store/kura-ichi-haymarket/dRUqeA6WQjuFgKPunqqf9g)；地址为 Shop 3, 76 Ultimo Road, Haymarket NSW 2000。菜单入口为 Uber Eats 外送菜单，未将外送价格和配送时段作为堂食价格或营业时间。
 - `dist/assets/kura-ichi-sashimi-bowl.jpg`：550 × 440 像素，来自上述店铺的 Deluxe Sashimi Bowl 菜品实拍。[原图](https://tb-static.uber.com/prod/image-proc/processed_images/3dac52f7d678bce2dba740e991fbbcb2/a1681d67ebe55c76c3af5f401619c278.jpeg)。仅通过 CSS 裁切显示，未放大或 AI 重绘。
 - 图片版权属于店铺／原权利人，未确认开放许可，项目代码的 MIT 许可不覆盖此照片。
+
+## 社区投稿图片
+
+自动收录的图片保存在 `dist/assets/submissions/`。原始 GitHub 图片链接、投稿 Issue 和审核记录保存在 `content/submissions/`；图片来源也随内容保留。此目录的图片不自动适用代码的 MIT 许可，投稿者需确认图片可以公开展示。

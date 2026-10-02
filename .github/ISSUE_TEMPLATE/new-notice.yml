@@ -1,6 +1,7 @@
 name: 投稿生活提醒
 description: 分享与校园生活有关的日期变化、办事提醒或实用信息。
 title: "[提醒投稿] "
+labels: ["投稿"]
 body:
   - type: markdown
     attributes:
@@ -27,7 +28,7 @@ body:
     id: effective-date
     attributes:
       label: 生效或相关日期
-      description: 可选，填写年份；没有固定日期或尚未公布时留空。
+      description: 可选，格式 YYYY-MM-DD；没有固定日期或尚未公布时留空。
   - type: textarea
     id: action
     attributes:
@@ -41,10 +42,20 @@ body:
       description: 官方页面、公开通知或遮去私人信息的通知截图。
     validations:
       required: true
+  - type: input
+    id: expires-on
+    attributes:
+      label: 展示截止日期
+      description: 可选，格式 YYYY-MM-DD。当天结束后退出首页推荐，长期内容可留空。
+  - type: textarea
+    id: images
+    attributes:
+      label: 配图
+      description: 直接粘贴或拖入图片，最多 3 张、每张不超过 5 MB；第一张作为封面。请使用 PNG、JPG、GIF 或 WebP。
   - type: checkboxes
     id: confirmation
     attributes:
       label: 确认信息
       options:
-        - label: 以上信息可公开展示，已附可核对的来源。
+        - label: 以上信息及配图可公开展示，已附可核对的来源。
           required: true

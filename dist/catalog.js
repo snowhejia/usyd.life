@@ -3,7 +3,7 @@
   const {sections, escape, detailUrl, dateLabel, icon} = AfterClass;
   const main = document.getElementById('catalog-main');
   const type = main.dataset.contentType;
-  const entries = [...sections[type].collection];
+  const entries = sections[type].collection.filter(item=>item.active !== false);
   const search = document.getElementById('catalog-search');
   const grid = document.getElementById('catalog-list');
   search.value = new URLSearchParams(location.search).get('q') || '';

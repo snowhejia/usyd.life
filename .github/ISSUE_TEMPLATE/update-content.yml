@@ -1,6 +1,7 @@
 name: 纠错或更新内容
-description: 更新已有活动、福利、提醒或美食，也可报告取消、失效、停业或过时信息。
+description: 更新已有条目，审核通过后自动生效。每次选择一个字段；同时改多项可使用网站纠错表单。
 title: "[内容更新] "
+labels: ["投稿"]
 body:
   - type: dropdown
     id: content-type
@@ -16,22 +17,56 @@ body:
   - type: input
     id: entry
     attributes:
-      label: 标题或条目 ID
-      placeholder: "例如：Canva Campus / canva"
+      label: 条目 ID
+      description: 详情网址中 id= 后面的内容。
+      placeholder: "例如：canva"
+    validations:
+      required: true
+  - type: dropdown
+    id: field
+    attributes:
+      label: 更新字段
+      options:
+        - 标题
+        - 介绍
+        - 活动日期
+        - 时间
+        - 地点
+        - 主办方
+        - 费用
+        - 参加条件
+        - 活动标签
+        - 报名链接
+        - 提供方
+        - 适用对象
+        - 有效期
+        - 领取方式
+        - 领取入口
+        - 生效日期
+        - 提醒事项
+        - 推荐菜
+        - 价格
+        - 地址
+        - 营业时间
+        - 菜单链接
+        - 来源
+        - 配图
+        - 展示截止日期
+        - 显示状态
     validations:
       required: true
   - type: textarea
-    id: correction
+    id: value
     attributes:
-      label: 更新内容
-      description: 说明原信息与应更新的信息。活动已取消、福利已失效或提醒已过时，也可以在这里报告。
+      label: 更新后的内容
+      description: 填写修改后的完整值。日期用 YYYY-MM-DD，活动标签用逗号分隔。显示状态填「显示」或「下架」；展示截止日期可填「清空」。配图可直接拖入，最多 3 张、每张不超过 5 MB。
     validations:
       required: true
   - type: textarea
     id: source
     attributes:
       label: 可核对的来源
-      description: 请附来源链接或遮去私人信息的通知截图。
+      description: 请附官方来源链接或 GitHub 上传的通知图片链接。
     validations:
       required: true
   - type: checkboxes
@@ -39,5 +74,5 @@ body:
     attributes:
       label: 确认信息
       options:
-        - label: 更新内容和来源可以公开展示。
+        - label: 更新内容和配图可以公开展示，已附可核对的来源。
           required: true

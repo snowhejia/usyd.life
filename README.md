@@ -90,20 +90,35 @@ npm run check
 
 检查必填字段、唯一 ID、日期、已知标签、来源链接、本地图片以及 HTML 引用；活动标签也会与 GitHub Issue 模板核对。浏览器中再检查对应列表、详情和手机布局。
 
-## GitHub 投稿
+## GitHub 投稿与自动收录
 
 `dist/config.js` 已指向 `https://github.com/snowhejia/usyd.life`。网站表单支持活动、权益、提醒、美食的新增和纠错，校验后预填 GitHub Issue 标题及内容。访客登录 GitHub 后完成提交；内容较长时使用复制粘贴方式。`.github/ISSUE_TEMPLATE/` 同时提供直接在仓库投稿的模板。
 
-图片可在 GitHub Issue 编辑框中直接粘贴或拖入，并随 Issue 保留。网站不会收集 GitHub 密码或把 Token 发给浏览器。
+投稿者在 GitHub 的「配图」栏目直接粘贴或拖入图片。最多 3 张，每张不超过 5 MB，支持 PNG、JPG、GIF、WebP；第一张作为封面，其余图片显示在详情页。收录时会把 GitHub 图片下载到仓库，不依赖外部图片热链。网站不会收集 GitHub 密码或把 Token 发给浏览器。
 
-维护者核实投稿后更新 `dist/data.js`，通过 Pull Request 审核并合并。未审核的 Issue 不会自动上架；审核合并后由 Railway 的自动部署发布。内容维护步骤见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+维护者只需核对 Issue，并添加 **`审核通过`** 标签：
+
+1. **Collect approved submission** 工作流确认操作人具有仓库写入权限，校验四类内容、日期、标签、来源和配图。
+2. 将审核时的投稿快照自动转换为网站数据，保存配图与 `content/submissions/<Issue 编号>.json` 收录记录。
+3. 自动关联详情评论 Issue，运行内容检查和测试，然后把数据、配图、评论关联一起提交到 `main`。
+4. 原 Issue 获得 **`已收录`** 标签和处理回执。连接 Railway 自动部署后，更新随部署发布。
+
+不需要手工修改 `data.js` 或另行合并 PR。仅有 triage/read 权限的账号不能批准发布。已有内容更新保持原 ID，点赞和评论关联不变；同一版本重复执行不会重复新增或覆盖之后的更新。不同投稿同时通过时，工作流会在最新 `main` 上重试，避免覆盖其他收录。
+
+如果校验、图片下载或测试失败，会标记 **`需补充`** 并回复原因，不提交无效内容。补充后请移除再重新添加 `审核通过` 标签。正文在审核后发生变化、条目在填写纠错表单后被其他人更新，都会要求重新审核。收录后的正文修改不会自动更新网站，需要再次审核。
+
+网站纠错表单会预填现有信息，支持一次更新多个字段；直接使用 GitHub 纠错模板时，一次选择一个字段。显示状态设为「下架」后退出首页和列表，原详情与讨论保留。旧版自由文字纠错需要按新表单重新提交。
+
+工作流只使用 GitHub 自动提供的 `GITHUB_TOKEN`，无需配置长期写入 Token。Actions 的 `contents: write`、`issues: write` 和 `actions: write` 分别用于数据提交、处理回执和触发后续检查。自动提交不会触发普通 `push` 工作流，因此收录任务内完成评论同步并显式触发 Checks。若日后保护 `main` 禁止此自动化写入，需要调整相应仓库规则，否则会安全失败并保留投稿。
+
+Actions 中也可手动运行收录任务，填写 Issue 编号；默认勾选「仅校验预览」，不会写入仓库。关闭该选项时仍需 `审核通过` 标签和维护者权限。内容维护字段见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 详情评论
 
 活动、权益、提醒和美食共用详情评论区。每条内容有一条独立 GitHub Issue，稳定对应 `类型:id`；读者可以在网站阅读评论，点击「写评论」到 GitHub 回复、编辑或上传图片。
 
 - 已有内容的讨论映射保存在 `dist/discussions.js`。
-- 新内容合并到 `main` 后，**Sync content discussions** 工作流自动建立缺少的讨论 Issue，并提交映射文件；也可在 Actions 手动运行。
+- 通过 Issue 自动收录时，评论关联与内容一起提交；手工更新数据时，**Sync content discussions** 工作流补齐讨论映射。也可在 Actions 手动运行。
 - 讨论通过 `content-discussion` 标签和正文中的稳定标识匹配。修改标题时保留内容 ID 和该标识，避免拆散历史评论。删除网站条目不会删除 GitHub 讨论。
 - 网站的 `/api/content/:type/:id/comments` 只读取评论，缓存约 3 分钟；「刷新评论」最多每 30 秒向 GitHub 更新一次。返回网站时也会刷新。
 - GitHub 限流或暂时不可用时保留上次可读结果，并提供原讨论入口；新部署且没有缓存时显示加载失败，不生成假评论。

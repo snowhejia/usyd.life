@@ -38,7 +38,11 @@ for (const [collection,required] of Object.entries(fields)) {
       catch { check(false,`${ref}: invalid ${field}`); }
     }
     for (const field of ['image','screenshot']) {
-      if (item[field]) check(/^assets\/[\w./-]+$/.test(item[field]) && fs.existsSync(path.join(dist,item[field])),`${ref}: missing local ${field}`);
+      if (item[field]) check(/^assets\/[\w./-]+$/.test(item[field]) && !item[field].split('/').includes('..') && fs.existsSync(path.join(dist,item[field])),`${ref}: missing local ${field}`);
+    }
+    if (item.gallery !== undefined) {
+      check(Array.isArray(item.gallery) && item.gallery.length<=2,`${ref}: gallery must contain at most two additional images`);
+      for(const photo of Array.isArray(item.gallery)?item.gallery:[])check(/^assets\/[\w./-]+$/.test(photo.image) && !photo.image.split('/').includes('..') && fs.existsSync(path.join(dist,photo.image)) && typeof photo.imageAlt==='string' && photo.imageAlt.trim(),`${ref}: invalid gallery image`);
     }
     if (item.image) check(typeof item.imageAlt === 'string' && item.imageAlt.trim(),`${ref}: imageAlt is required for images`);
     if (item.imageFit) check(['cover','contain'].includes(item.imageFit),`${ref}: imageFit must be cover or contain`);

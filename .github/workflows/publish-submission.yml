@@ -1,0 +1,38 @@
+name: Collect approved submission
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: '投稿 Issue 编号（需有审核通过标签）'
+        required: true
+        type: string
+      dry_run:
+        description: '仅校验预览，不写入仓库'
+        type: boolean
+        default: true
+permissions:
+  contents: write
+  issues: write
+  actions: write
+concurrency:
+  group: collect-issue-${{ github.event.issue.number || inputs.issue_number }}
+  cancel-in-progress: false
+jobs:
+  collect:
+    if: github.event_name == 'workflow_dispatch' || (github.event.label.name == '审核通过' && !github.event.issue.pull_request)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate and collect the approved snapshot
+        run: node scripts/publish-issue.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

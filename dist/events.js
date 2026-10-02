@@ -30,7 +30,7 @@
       const queryMatch = !query || [item.title,item.name,item.location,item.organiser,item.search,...tagNames(item)].join(' ').toLocaleLowerCase().includes(query);
       const monthMatch = /^\d{4}-\d{2}$/.test(period.value) && item.startDate.slice(0,7) <= period.value && end.slice(0,7) >= period.value;
       const timeMatch = period.value === 'all' || (period.value === 'upcoming' && end >= today()) || (period.value === 'past' && end < today()) || monthMatch;
-      return tagsMatch && queryMatch && timeMatch;
+      return item.active !== false && tagsMatch && queryMatch && timeMatch;
     }).sort((a,b) => a.startDate.localeCompare(b.startDate));
     const url = new URL(location.href);
     for (const key of ['tag','q','period']) url.searchParams.delete(key);

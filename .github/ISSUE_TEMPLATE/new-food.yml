@@ -1,6 +1,7 @@
 name: 投稿美食推荐
 description: 推荐校内或悉大周边的餐厅、餐食和适合学生的吃饭地点。
 title: "[美食投稿] "
+labels: ["投稿"]
 body:
   - type: markdown
     attributes:
@@ -53,10 +54,20 @@ body:
       label: 店铺、菜单或地图链接
     validations:
       required: true
+  - type: input
+    id: expires-on
+    attributes:
+      label: 展示截止日期
+      description: 可选，格式 YYYY-MM-DD。当天结束后退出首页推荐，长期内容可留空。
+  - type: textarea
+    id: images
+    attributes:
+      label: 配图
+      description: 直接粘贴或拖入图片，最多 3 张、每张不超过 5 MB；第一张作为封面。请使用 PNG、JPG、GIF 或 WebP。
   - type: checkboxes
     id: confirmation
     attributes:
       label: 确认信息
       options:
-        - label: 以上信息可公开展示，已附可核对的来源。
+        - label: 以上信息及配图可公开展示，已附可核对的来源。
           required: true

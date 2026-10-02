@@ -35,12 +35,16 @@
   panel.innerHTML = [
     '<div class="submission-shell"><form id="submission-form" novalidate><div class="submission-layout"><aside class="submission-sidebar" aria-label="投稿选项"><div class="submission-sidebar-inner"><div class="submission-heading"><h1 id="submission-title">投稿</h1></div>',
     '<div class="submission-progress" aria-label="投稿步骤"><span id="step-edit" class="current">01 填写</span><i></i><span id="step-preview">02 预览</span>' + (repository ? '<i></i><span>03 提交</span>' : '') + '</div>',
-    '<p class="submission-hint">' + (repository ? '投稿需使用 GitHub 账号，审核后收录。' : '投稿暂未开放，填写后可预览并复制内容。') + '</p>',
+    '<p class="submission-hint">' + (repository ? '投稿需使用 GitHub 账号，审核通过后自动收录。' : '投稿暂未开放，填写后可预览并复制内容。') + '</p>',
     '<div class="submission-type-options" role="group" aria-label="内容类型">',
     ...Object.entries(types).map(([key, label]) => '<label><input type="radio" name="contentType" value="' + key + '" aria-label="' + label + '"' + (key === 'event' ? ' checked' : '') + '><strong>' + label + '</strong></label>'),
     '</div>',
     '<div class="submission-kind" role="group" aria-label="投稿方式"><label><input type="radio" name="kind" value="new" checked>新增内容</label><label><input type="radio" name="kind" value="update">纠错 / 更新</label></div>',
     '</div></aside><div class="submission-content"><div id="submission-editor">',
+    '<div class="submission-fields" data-form-section="update" hidden>',
+    '<label class="form-field full">要更新哪一条？ *<select name="entryId" required><option value="">选择已有内容</option></select></label>',
+    textarea('correction', '更新说明', {placeholder:'说明这次修改了什么。下方已填入现有信息，请修改需要更新的部分。'}),
+    '</div>',
     '<div class="submission-fields" data-form-section="common">',
     input('title', '活动名称', {full:true, labelId:'entry-title-label', max:90, placeholder:'填写名称或标题'}),
     textarea('description', '活动介绍', {labelId:'entry-description-label', placeholder:'简要介绍内容和参与方式。'}),
@@ -80,11 +84,8 @@
     input('foodHours', '营业时间', {optional:true, placeholder:'知道时填写，注明工作日或周末'}),
     input('foodMenu', '菜单链接', {type:'url', optional:true, max:600, placeholder:'https://…'}),
     '</div>',
-    '<div class="submission-fields" data-form-section="update" hidden>',
-    '<label class="form-field full">要更新哪一条？ *<select name="entryId" required><option value="">选择已有内容</option></select></label>',
-    textarea('correction', '需要修改或补充什么', {placeholder:'说明原信息和最新信息；已取消、已失效的内容也可以报告。'}),
-    '</div>',
     '<div class="submission-fields submission-source">',
+    input('expiresOn','展示截止日期',{type:'date',optional:true,full:true,help:'当天结束后退出首页推荐；长期内容可留空。'}),
     input('source', '原始通知 / 来源链接', {type:'url', full:true, labelId:'entry-source-label', max:600, placeholder:'https://…', help:'官方页面、菜单、地图或公开通知均可。'}),
     '</div>',
     '<label class="submission-consent"><input type="checkbox" name="publicConsent" required>我确认以上信息可公开展示，并已附上可核对的来源。</label>',
@@ -107,9 +108,23 @@
     return collections[form.elements.contentType.value].find(item => item.id === form.elements.entryId.value);
   }
   function selectSource() {
-    const item = selectedEntry();
-    form.elements.source.value = item?.collectionSource || item?.source || '';
-    form.elements.correction.value = '';
+    const item=selectedEntry();
+    if(!item)return;
+    const values={title:item.title,description:item.description,organiser:item.organiser,date:item.startDate,endDate:item.endDate,time:item.time,location:item.location,eligibility:item.audience,registration:item.registration,
+      provider:item.provider,benefitAudience:item.eligibility,benefitCost:item.cost,claim:item.claim,claimUrl:item.claimUrl,benefitStart:'',benefitEnd:item.expiresOn,
+      noticeAudience:item.audience,noticeDate:item.effectiveDate,noticeAction:item.action,foodDishes:item.dishes,foodBudget:item.budget || item.price,foodLocation:item.address || item.location,foodHours:item.hours,foodMenu:item.menuUrl,
+      expiresOn:item.expiresOn,source:item.collectionSource || item.source,correction:''};
+    for(const [name,value] of Object.entries(values))form.elements[name].value=value || '';
+    const cost=form.elements.cost;
+    let existingOption=[...cost.options].find(option=>option.value===item.price);
+    if(item.price&&!existingOption){existingOption=new Option(item.price,item.price);cost.add(existingOption);}
+    cost.value=item.price || '';
+    const validity=form.elements.validity;
+    let validityOption=[...validity.options].find(option=>option.value===item.validity);
+    if(item.validity&&!validityOption){validityOption=new Option(item.validity,item.validity);validity.add(validityOption);}
+    validity.value=item.validity || 'unknown';
+    for(const field of form.querySelectorAll('[name=tags]'))field.checked=(item.tags || []).includes(field.value);
+    syncFields();
   }
   function syncFields() {
     const type = form.elements.contentType.value;
@@ -117,18 +132,18 @@
     if (optionType !== type) {
       optionType = type;
       form.elements.entryId.innerHTML = '<option value="">选择已有' + types[type] + '</option>' + collections[type].map(item => '<option value="' + escape(item.id) + '">' + escape(nameOf(item)) + '</option>').join('');
-      if (!isNew) selectSource();
+
     }
     for (const section of form.querySelectorAll('[data-form-section]')) {
       const key = section.dataset.formSection;
-      const active = isNew ? key === 'common' || key === type : key === 'update';
+      const active = key === 'common' || key === type || (!isNew && key === 'update');
       section.hidden = !active;
       section.querySelectorAll('input,select,textarea').forEach(field => {
         field.disabled = !active;
         field.setCustomValidity('');
       });
     }
-    const limited = isNew && type === 'benefit' && form.elements.validity.value === 'limited';
+    const limited = type === 'benefit' && form.elements.validity.value === 'limited';
     panel.querySelector('#benefit-period').hidden = !limited;
     for (const name of ['benefitStart','benefitEnd']) form.elements[name].disabled = !limited;
     panel.querySelector('#entry-title-label').textContent = ({event:'活动名称',benefit:'福利名称',notice:'提醒标题',food:'店名 / 餐厅名称'})[type] + ' *';
@@ -182,7 +197,7 @@
     if (tagInputs.length && !tagInputs.some(field => field.checked)) tagInputs[0].setCustomValidity('请至少选择一个活动标签。');
     return form.reportValidity();
   }
-  form.addEventListener('submit', event => {
+  form.addEventListener('submit', async event => {
     event.preventDefault();
     if (!validate()) return;
     const payload = new FormData(form);
@@ -191,43 +206,46 @@
     const type = values.contentType;
     const updating = values.kind === 'update';
     const summary = [['内容类型',types[type]],['投稿方式',updating ? '纠错 / 更新' : '新增内容']];
-    let title = values.title?.trim();
-    if (updating) {
-      const item = selectedEntry();
-      if (!item) return;
-      title = nameOf(item);
-      summary.push(['条目 ID',item.id],['原标题',title],['更新内容',values.correction.trim()]);
-    } else {
-      summary.push(['标题',title],['介绍',values.description.trim()]);
-      if (type === 'event') {
-        summary.push(['活动标签',values.tags.map(tag => '#' + data.tags[tag]).join('、')],['主办方',values.organiser],['日期',values.date + (values.endDate && values.endDate !== values.date ? ' 至 ' + values.endDate : '')],['悉尼当地时间',values.time],['地点',values.location],['费用',values.cost],['参加条件',values.eligibility],['报名链接',values.registration]);
-      } else if (type === 'benefit') {
-        const validity = {ongoing:'长期有效，以官方政策为准',limited:'有截止日期',unknown:'有效期待确认'}[values.validity];
-        summary.push(['福利提供方',values.provider],['适用对象',values.benefitAudience],['费用与限制',values.benefitCost],['有效期',validity]);
-        if (values.validity === 'limited') summary.push(['开始日期',values.benefitStart],['截止日期',values.benefitEnd]);
-        summary.push(['领取 / 使用方式',values.claim],['领取入口',values.claimUrl]);
-      } else if (type === 'food') {
-        summary.push(['推荐菜 / 餐食',values.foodDishes],['人均预算 / 价格',values.foodBudget],['地址 / 校内位置',values.foodLocation],['营业时间',values.foodHours],['菜单链接',values.foodMenu]);
-      } else {
-        summary.push(['适用对象 / 范围',values.noticeAudience],['生效或相关日期',values.noticeDate],['需要注意或做什么',values.noticeAction]);
-      }
+    const title=values.title?.trim();
+    let baseMarker='';
+    if(updating) {
+      const item=selectedEntry();if(!item)return;
+      const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(item)));
+      baseMarker='\n<!-- usyd-base:'+Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('')+' -->\n';
+      summary.push(['条目 ID',item.id],['更新说明',values.correction.trim()]);
     }
+    summary.push(['标题',title],['介绍',values.description.trim()]);
+    if (type === 'event') {
+      summary.push(['活动标签',values.tags.map(tag => '#' + data.tags[tag]).join('、')],['主办方',values.organiser],['日期',values.date + (values.endDate && values.endDate !== values.date ? ' 至 ' + values.endDate : '')],['悉尼当地时间',values.time],['地点',values.location],['费用',values.cost],['参加条件',values.eligibility],['报名链接',values.registration]);
+    } else if (type === 'benefit') {
+      const validity = {ongoing:'长期有效，以官方政策为准',limited:'有截止日期',unknown:'有效期待确认'}[values.validity] || values.validity;
+      summary.push(['福利提供方',values.provider],['适用对象',values.benefitAudience],['费用与限制',values.benefitCost],['有效期',validity]);
+      if (values.validity === 'limited') summary.push(['开始日期',values.benefitStart],['截止日期',values.benefitEnd]);
+      summary.push(['领取 / 使用方式',values.claim],['领取入口',values.claimUrl]);
+    } else if (type === 'food') {
+      summary.push(['推荐菜 / 餐食',values.foodDishes],['人均预算 / 价格',values.foodBudget],['地址 / 校内位置',values.foodLocation],['营业时间',values.foodHours],['菜单链接',values.foodMenu]);
+    } else {
+      summary.push(['适用对象 / 范围',values.noticeAudience],['生效或相关日期',values.noticeDate],['需要注意或做什么',values.noticeAction]);
+    }
+    if(values.expiresOn || (updating && values.validity!=='limited'))summary.push(['展示截止日期',values.expiresOn || '清空']);
     summary.push(['来源',values.source.trim()]);
     const prefix = {event:'活动',benefit:'福利',notice:'提醒',food:'美食'}[type];
     const issueTitle = '[' + prefix + (updating ? '更新' : '投稿') + '] ' + title;
     const valueOf = value => String(value || '未提供').trim();
-    markdown = '## ' + issueTitle + '\n\n' + summary.map(([label,value]) => '### ' + label + '\n' + valueOf(value) + '\n').join('\n') + '\n---\n- [x] 信息可公开展示，已附可核对的来源。\n- [ ] 维护者已核对并收录。\n\n由 USYD EVENTS WALL 共建投稿表单生成。';
+    markdown = '## ' + issueTitle + '\n\n' + summary.map(([label,value]) => '### ' + label + '\n' + valueOf(value) + '\n').join('\n') + '\n### 配图\n<!-- 可在这里粘贴或拖入图片；最多 3 张，第一张作为封面。 -->\n\n---\n- [x] 信息及配图可公开展示，已附可核对的来源。\n' + baseMarker;
     panel.querySelector('#submission-summary').innerHTML = '<h3>' + escape(title) + '</h3><dl class="submission-summary-facts">' + summary.filter(([label,value]) => label !== '条目 ID' && String(value || '').trim()).map(([label,value]) => '<dt>' + escape(label) + '</dt><dd>' + escape(valueOf(value)) + '</dd>').join('') + '</dl>';
     if (repository) {
       const target = new URL(repository + '/issues/new');
       target.searchParams.set('title',issueTitle);
       target.searchParams.set('body',markdown);
+      target.searchParams.set('labels','投稿');
       // Use a plain Issue when the repo also has dedicated structured templates.
       target.searchParams.set('template','');
       const link = panel.querySelector('#github-submit-link');
       const long = target.href.length > 7800;
-      link.href = long ? repository + '/issues/new?template=' : target.href;
-      panel.querySelector('#github-next-hint').textContent = long ? '内容较长。请先复制内容，再前往 GitHub 新建 Issue，粘贴并提交。' : '请在 GitHub 页面确认并提交，可粘贴或拖入图片。';
+      if(long)target.searchParams.delete('body');
+      link.href = target.href;
+      panel.querySelector('#github-next-hint').textContent = long ? '内容较长。请先复制内容，再前往 GitHub 新建 Issue，粘贴并提交。' : '在 GitHub 的「配图」栏目上传图片，第一张作为封面。确认后提交即可。';
     }
     editor.hidden = true;
     preview.hidden = false;
