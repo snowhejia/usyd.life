@@ -1,0 +1,79 @@
+name: 投稿学生权益
+description: 分享持续可领取的学生权益、优惠或校园资源。
+title: "[福利投稿] "
+body:
+  - type: markdown
+    attributes:
+      value: "请提供可核对的来源。提交后由维护者核实收录，Issue 内容会公开展示。"
+  - type: input
+    id: title
+    attributes:
+      label: 福利名称
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 福利内容
+      description: 能获得什么权益或优惠？
+    validations:
+      required: true
+  - type: input
+    id: provider
+    attributes:
+      label: 福利提供方
+    validations:
+      required: true
+  - type: input
+    id: audience
+    attributes:
+      label: 适用对象
+      description: 说明是否需要学生身份、会员资格或其他条件。
+    validations:
+      required: true
+  - type: input
+    id: cost
+    attributes:
+      label: 费用与限制
+    validations:
+      required: true
+  - type: dropdown
+    id: validity
+    attributes:
+      label: 有效期
+      options:
+        - 长期有效，以官方政策为准
+        - 有截止日期
+        - 有效期待确认
+    validations:
+      required: true
+  - type: input
+    id: dates
+    attributes:
+      label: 起止日期
+      description: 有截止日期时请填写，含年份；尚未公布的日期请勿猜测。
+  - type: textarea
+    id: claim
+    attributes:
+      label: 领取或使用方式
+    validations:
+      required: true
+  - type: input
+    id: claim-url
+    attributes:
+      label: 领取入口
+      placeholder: "https://…"
+  - type: textarea
+    id: source
+    attributes:
+      label: 可核对的来源
+      description: 官方页面、公开通知或遮去私人信息的通知截图。
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: 确认信息
+      options:
+        - label: 以上信息可公开展示，已附可核对的来源。
+          required: true

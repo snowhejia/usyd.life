@@ -1,0 +1,7 @@
+USYD EVENTS WALL simplified lion, 2026-10-03
+Tool: built-in image_gen.imagegen, edit mode, transparent_background=true
+Input: dist/assets/after-class-lion-pixel.png
+Output: dist/assets/usyd-events-lion-simple.png
+
+Final prompt:
+Use case: logo-brand, precise-object-edit. Edit the provided lion logo into a radically simplified, highly legible small website favicon and navigation icon. Keep its cheerful orange-maned yellow lion identity and warm dark cocoa outline, but REMOVE the body, legs, tail, ALL internal mane strokes, fur texture, flecks, highlights, gradients and shading. Only a lion HEAD. Draw as very simple charming flat pixel art with a 24-by-24 logical pixel grid and thick crisp stepped edges. THREE SOLID COLORS ONLY: orange #ea863f mane, warm yellow #f3cf76 face, dark cocoa #4c302b outline and features. A single compact mane silhouette of just 6 to 8 broad slightly asymmetric tufts, not dozens of tiny spikes. Big integrated golden face, tiny ears embedded in the mane, two single square eyes, one small dark nose and a minimal tiny smile. The face and mane should read as one friendly coherent lion, not a bear or detached cat inside a flower. Very low detail, bold simple shapes, readable at 32 pixels, with a little handmade asymmetry. Center one icon filling about 88% of a square canvas; the entire space outside the lion is genuinely TRANSPARENT. No text, no letters, no label, no badge, no frame, no shadow, no background. This is an unofficial student website mascot, not the official university crest.

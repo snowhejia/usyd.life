@@ -1,0 +1,151 @@
+window.CAMPUS_DATA = {
+  updatedAt: '2026-10-03',
+  timezone: 'Australia/Sydney',
+  contentTypes: {event:'校园活动', benefit:'学生权益', notice:'生活提醒', food:'美食推荐'},
+  tags: {club:'社团', social:'社交', learning:'学习', career:'职业', sports:'运动', volunteering:'公益', food:'美食', music:'音乐', free:'免费', online:'线上'},
+  craftUrl: 'https://books-cough-6mk.craft.me/0j05SQY1ZMu8ai',
+  events: [
+    {
+      id: 'gelato', artwork: 'icecream', entryFree: true, tags: ['food','free'], title: 'PNR 免费冰淇淋', name: 'Free Gelato outside PNR', subtitle: 'Free Gelato · 工程学院 SES 活动',
+      startDate: '2026-10-06', endDate: '2026-10-06', month: 'OCT', day: '06', weekday: '周二',
+      time: '11:00 开始 · 送完为止', location: 'PNR 楼外', price: '免费', tag: 'FREE GELATO',
+      organiser: 'Engineering · SES 活动', audience: '工程学院消息；参加范围请查看原通知',
+      description: '工程学院为庆祝学生体验调查（SES）达到新里程碑，将于 10 月 6 日上午 11 点送出免费冰淇淋，数量有限，送完为止。',
+      note: '数量有限，送完为止。活动未公布固定结束时间。',
+      source: 'https://books-cough-6mk.craft.me/0j05SQY1ZMu8ai/b/B35B9DA8-764D-42F4-9488-765702951B7A', sourceLabel: '查看原始收藏', screenshot: 'assets/gelato-update.jpg', search: '冰淇淋 gelato pnr 免费 工程 小车 美食'
+    },
+    {
+      id: 'manning', entryFree: true, tags: ['social','food','music','free'], title: '校园夜市 · Manning Night Market', name: 'Manning Night Market', subtitle: '美食、现场音乐，还有夜晚的好心情',
+      startDate: '2026-10-14', endDate: '2026-10-15', sessions: ['2026-10-14', '2026-10-15'], month: 'OCT', day: '14–15', weekday: '周三 / 周四',
+      time: '每天 17:00–22:00', location: 'Manning House', price: '免费入场 · 餐饮另付', tag: 'FOOD & MUSIC',
+      organiser: 'University of Sydney Union (USU)', audience: '学生、家人和社区成员均可参加',
+      description: '两晚夜市汇集各地美食、现场音乐和 DJ，还有免费的创意活动。免费入场，餐饮消费另外支付。',
+      note: 'USU 官网提供预登记入口。每晚前 500 位预登记并到场的 USU 会员可领取餐饮券；前 125 位 Rewards 会员还有额外甜品券，具体以主办方规则为准。',
+      image: 'assets/manning-banner.png', imageAlt: 'USU Manning Night Market 官方活动海报', source: 'https://usu.edu.au/manning-night-market/', sourceLabel: '主办方活动介绍',
+      registration: 'https://moshtix.com.au/v2/event/manning-night-market/200090?skin=ManningNightMarket', registrationLabel: '前往预登记', search: '夜市 manning night market usu 音乐 dj 免费 美食'
+    },
+    {
+      id: 'boardgames-origami-2026-10-15', tags: ['social','food'], title: '桌游与折纸 · Boardgames & Origami', name: 'Boardgames & Origami', subtitle: '桌游 · 折纸 · 免费零食',
+      startDate: '2026-10-15', endDate: '2026-10-15', time: '10:30–15:30', location: 'Wintergarden · Building J12', price: '提供免费零食',
+      organiser: 'Computer Science Student Portal', audience: '计算机科学本科生与研究生',
+      description: '课间来玩桌游、折纸，顺便吃点免费零食。活动时段内可随时加入，待几分钟或一个小时都可以，也欢迎和新同学一起玩。',
+      note: '通知面向计算机科学本科生和研究生。可在 Canvas 的 Computer Science Student Portal 查看 Boardgames & Origami 通知。',
+      source: 'https://canvas.sydney.edu.au/', sourceLabel: '打开 Canvas 学生门户（需登录）',
+      image: 'assets/boardgames-dice.jpg', imageAlt: '骰子桌游主题配图，非本次活动现场照片', imagePosition: '50% 54%', imageSource: 'https://unsplash.com/photos/white-and-black-dice-on-red-textile-8RRYJg26Wr4', imageCredit: 'Joel Abraham / Unsplash',
+      search: '桌游 折纸 零食 boardgame boardgames origami pause wintergarden j12 计算机 computer science cs'
+    },
+    {
+      id: 'sculpture-by-the-sea-bondi-2026', entryFree: true, tags: ['social','free'], title: '邦迪海滩雕塑节 · Sculpture by the Sea', name: 'Sculpture by the Sea, Bondi 2026', subtitle: '沿着海岸步道看露天雕塑展',
+      startDate: '2026-10-16', endDate: '2026-11-02', time: '户外展览 · 建议白天参观', location: 'Bondi → Tamarama 海岸步道', price: '免费参观',
+      organiser: 'Sculpture by the Sea', audience: '面向公众开放',
+      description: '从 Bondi 到 Tamarama 的约 2 公里海岸步道化身露天雕塑展，汇集澳大利亚和世界各地艺术家的作品。可以边看展边沿海散步。',
+      note: '周末人流较多、停车位有限，建议乘公共交通前往。配图为 2025 年展览现场，作品是 Andrew Cullen 的 Rustle。',
+      source: 'https://sculpturebythesea.com/bondi/', sourceLabel: '雕塑节官方网站', verifiedAt: '2026-10-03',
+      image: 'assets/bondi-sculpture-by-the-sea.jpg', imageAlt: '2025 年邦迪海滩雕塑展实拍：Andrew Cullen 的蜥蜴雕塑 Rustle，摄影 Charlotte Curd', imagePosition: '50% 48%', imageSource: 'https://sculpturebythesea.com/bondi/', imageCredit: 'Charlotte Curd / Sculpture by the Sea',
+      search: '邦迪 海滩 雕塑 雕塑节 艺术 展览 海边 步道 免费 bondi tamarama sculpture by the sea rustle'
+    },
+    {
+      id: 'festival', entryFree: true, tags: ['social','learning','music','free'], title: '悉大社区节 · Community Festival', name: 'University of Sydney Community Festival', subtitle: '把朋友带进校园，过一个不一样的周六',
+      startDate: '2026-11-07', endDate: '2026-11-07', month: 'NOV', day: '07', weekday: '周六',
+      time: '11:00–16:00', location: 'Camperdown 校区', price: '免费活动', tag: 'CAMPUS & COMMUNITY',
+      organiser: 'The University of Sydney', audience: '面向社区，欢迎朋友与家人',
+      description: '活动包括现场表演、亲子活动、主题讲座、动手工作坊和校园导览，也有美食可以探索。',
+      note: '具体场次、名额和报名安排请查看活动官网。',
+      image: 'assets/community-festival-performer.jpg', imageAlt: 'Community Festival 官方首页的悉大校园表演照片', screenshot: 'assets/community-source.jpg',
+      source: 'https://community-festival.sydney.edu.au/2026/10819038?ref=edm-a-o-n3-wods', sourceLabel: '活动官方网站', search: '社区 校园 节日 社交 聚会 community festival camperdown 免费'
+    }
+  ],
+  benefits: [{
+    id: 'canva', imageFit: 'contain', image: 'assets/canva-campus-official.png', imageAlt: 'Canva 官方 Canva for Campus 产品宣传图', imagePosition: '50% 50%', imageSource: 'https://www.canva.com/newsroom/news/canva-for-campus/', imageCredit: 'Canva', provider: 'The University of Sydney', eligibility: '悉尼大学学生', validity: '未公布截止日期，以学校政策为准', cost: '免费，须符合学校使用资格', claim: '进入 Canva，选择学校 SSO，使用 Unikey 登录。', title: 'Canva Campus', subtitle: '学校提供的设计工具权益，支持演示文稿、简历和海报制作。',
+    description: '学校通知说明，悉大学生可使用 Canva Campus 的高级模板、图库、视频、音频、文件夹和云存储功能。进入 Canva 后，选择学校的单点登录（SSO），使用 Unikey 完成登录。',
+    homeSummary: '悉大学生免费使用\n学校 SSO / Unikey 登录',
+    note: '这是学校提供的 Canva Campus 权益。登录时请使用学校 SSO；已有个人账号的同学，项目迁移方式以学校说明为准。',
+    claimUrl: 'https://www.canva.com/', source: 'https://www.canva.com/', sourceLabel: '打开 Canva',
+    collectionSource: 'https://books-cough-6mk.craft.me/0j05SQY1ZMu8ai/b/CCE7F7A2-62EF-489E-A575-005DF9805B4A', screenshot: 'assets/canva-source.jpg'
+  }, {
+    id: 'foodhub', title: 'FoodHub 免费食品', name: 'USU FoodHub', provider: 'University of Sydney Union (USU)',
+    eligibility: '悉尼大学学生', cost: '免费 · 每次最多领取 5 件物品', validity: '持续提供，以可预约场次为准',
+    location: 'Wentworth Building · Level 3（University Health Services 旁）', hours: '周一至周五 09:00–16:00；请按预约时段到场。',
+    subtitle: '免费领取食品与生活必需品，需提前预约并自备袋子。',
+    description: 'FoodHub 为有生活成本压力或食物需求的悉大学生提供免费食品和生活必需品。每次可选 5 件物品，现场供应随库存变化。',
+    claim: '在 FoodHub 门户预约领取时段，每场开始前 2 小时开放预约。到场出示电子或打印预约票，自备购物袋；领取散装米粮等物品时另带容器。',
+    homeSummary: '免费食品与生活必需品\n预约领取 · Wentworth L3',
+    note: '请只在预约时段到场；实际可约时段和库存以 FoodHub 当日安排为准。',
+    claimUrl: 'https://secure.usuonline.com/fh', claimLabel: '预约领取', source: 'https://usu.edu.au/foodhub/', sourceLabel: 'FoodHub 官方说明', verifiedAt: '2026-10-03',
+    image: 'assets/foodhub-official.jpg', imageAlt: 'USU FoodHub 官方实拍：Wentworth Building 的 FoodHub 入口', imagePosition: '50% 50%', imageSource: 'https://usu.edu.au/foodhub/', imageCredit: 'USU'
+  }, {
+    id: 'university-canteen', title: '5 澳元校园食堂', name: 'University Canteen', provider: 'The University of Sydney',
+    eligibility: '悉尼大学学生，购买时出示学生证', cost: '指定早、午、晚餐 A$5 / 份', validity: '持续提供，菜单与供应情况见官网',
+    location: 'Electrical Engineering Building（J03）· Level 2', hours: '周一至周五营业 08:00–19:00；5 澳元早餐 08:00–10:00、午餐 11:30–14:30、晚餐 17:00–19:00。',
+    subtitle: 'J03 新食堂提供 5 澳元早、午、晚餐，凭学生证购买。',
+    description: 'University Canteen 在 Electrical Engineering Building 提供学生平价餐。周一至周五有指定的 5 澳元早餐、午餐和晚餐，也供应其他餐食、零食与饮品。',
+    claim: '查看最新菜单，在相应供餐时段到 J03 Level 2 食堂点餐，并向工作人员出示学生证。',
+    homeSummary: '凭学生证购买 A$5 餐食\nJ03 Level 2 · 周一至周五',
+    note: '5 澳元适用于指定学生餐，其他餐食和饮品单独计价；菜品以最新菜单为准。',
+    claimUrl: 'https://storage.googleapis.com/smartqprdau_pub/hf/unisyd/027d91f78ec5de9fa1653f5ca1710840/index.html', claimLabel: '查看最新菜单', mapUrl: 'https://maps.sydney.edu.au/?room=J03.02.240',
+    source: 'https://www.sydney.edu.au/students/food-and-retail-on-campus/campus-cheap-eats.html', sourceLabel: '学校食堂说明', verifiedAt: '2026-10-03',
+    image: 'assets/university-canteen-menu.jpg', imageFit: 'contain', imageAlt: 'University Canteen 官方 5 澳元早餐菜单示例，具体菜品以最新菜单为准', imagePosition: '50% 50%', imageSource: 'https://storage.googleapis.com/smartqprdau_pub/hf/unisyd/027d91f78ec5de9fa1653f5ca1710840/index.html', imageCredit: 'University Canteen / The University of Sydney'
+  }],
+  foods: [
+    {
+      id: 'courtyard', image: 'assets/courtyard-photo.jpg', imageAlt: 'Courtyard 官方实拍：番茄意面、青酱意面及餐食', imagePosition: '50% 50%', imageSource: 'https://usu.edu.au/food-drink/courtyard/', imageCredit: 'USU', title: 'Courtyard', name: 'Courtyard Restaurant and Bar', icon: 'pizza',
+      dishes: '披萨 · 意面 · 沙拉', location: 'Holme Building · Science Road',
+      address: 'Level 3, Holme Building, Science Road, Camperdown NSW 2006',
+      price: '披萨 A$15–25（非会员价）', budget: '人均视点单而定；2026 官方菜单披萨非会员价为 A$15–25，会员价格见菜单。',
+      hours: '官网列示周一至周五 08:00–16:00；具体供餐时段请向店铺确认。',
+      description: '位于 Holme Building，供应披萨、意面和沙拉。菜单列有素食选择，可从 Science Road 一侧进入。',
+      source: 'https://usu.edu.au/food-drink/courtyard/',
+      menuUrl: 'https://assets.ctfassets.net/n92mdxt3dwn7/4P2U3aDDkne9LBjkBjo38k/c068d7737e881b48632eb95ac652da86/CY-A4_Food_Menu2026.pdf',
+      basis: '官方资料整理', verifiedAt: '2026-10-03'
+    },
+    {
+      id: 'nene-chicken', image: 'assets/nene-chicken-photo.jpg', imageAlt: 'NeNe Chicken 官方实拍：学生在 Manning House 享用炸鸡', imagePosition: '50% 62%', imageSource: 'https://usu.edu.au/food-drink/nene-chicken/', imageCredit: 'USU', title: 'NeNe Chicken', name: 'NeNe Chicken', icon: 'chicken',
+      dishes: '韩式炸鸡', location: 'Manning House · Level 1',
+      address: 'Level 1, Manning House, Manning Road, Camperdown NSW 2006',
+      price: '价格以门店菜单为准', budget: '价格待同学补充，以门店菜单为准。',
+      hours: '官网列示周一至周五 10:00–18:00。',
+      description: 'Manning House 内的韩式炸鸡店。具体口味、餐品搭配和现价可向门店查询。',
+      source: 'https://usu.edu.au/food-drink/nene-chicken/',
+      basis: '官方资料整理', verifiedAt: '2026-10-03'
+    },
+    {
+      id: 'happy-ramen', image: 'assets/happy-ramen-photo.jpg', imageAlt: 'Happy Ramen Canteen 官方实拍：不同配料的拉面碗', imagePosition: '50% 50%', imageSource: 'https://usu.edu.au/food-drink/happy-ramen-canteen/', imageCredit: 'USU', title: 'Happy Ramen', name: 'Happy Ramen Canteen', icon: 'bowl',
+      dishes: '自选拉面 · 串食', location: 'Wentworth Building · Level 2',
+      address: 'Level 2, Wentworth Building, 2 Butlin Avenue, Darlington NSW 2008',
+      price: '价格以门店菜单为准', budget: '价格待同学补充，以门店菜单为准。',
+      hours: '官网列示周一至周四 10:00–18:30，周五 10:00–18:00。',
+      description: '位于 Wentworth Building，可选择拉面配料，并提供串食等搭配。',
+      source: 'https://usu.edu.au/food-drink/happy-ramen-canteen/',
+      basis: '官方资料整理', verifiedAt: '2026-10-03'
+    },
+    {
+      id: 'kura-ichi', title: 'KURA ICHI 日料', name: 'Kura Ichi (Haymarket)', icon: 'bowl',
+      dishes: '海鲜丼 · 刺身 · 炙烤丼', location: 'Haymarket · Ultimo Road',
+      address: 'Shop 3, 76 Ultimo Road, Haymarket NSW 2000',
+      price: '价格以门店菜单为准', budget: '价格以门店菜单为准，外送平台售价可能与堂食不同。',
+      description: 'Haymarket 的日式丼饭小店，供应三文鱼、金枪鱼、扇贝鱼籽等海鲜饭，也有炙烤三文鱼饭。',
+      source: 'https://www.ubereats.com/au/store/kura-ichi-haymarket/dRUqeA6WQjuFgKPunqqf9g', sourceLabel: '查看店铺资料',
+      menuUrl: 'https://www.ubereats.com/au/store/kura-ichi-haymarket/dRUqeA6WQjuFgKPunqqf9g',
+      basis: '店铺菜单整理', verifiedAt: '2026-10-03',
+      image: 'assets/kura-ichi-sashimi-bowl.jpg', imageAlt: 'KURA ICHI 店铺菜单中的 Deluxe Sashimi Bowl 海鲜丼饭实拍', imagePosition: '50% 50%', imageSource: 'https://www.ubereats.com/au/store/kura-ichi-haymarket/dRUqeA6WQjuFgKPunqqf9g', imageCredit: 'Kura Ichi / Uber Eats 店铺菜单'
+    }
+  ],
+  notices: [
+    {
+      id: 'daylight-saving-2026', image: 'assets/daylight-saving-clock.jpg', imageAlt: '粉色桌面上的实体闹钟，时间调整主题配图', imagePosition: '32% 45%', imageSource: 'https://unsplash.com/photos/white-and-pink-analog-alarm-clock-jOeh3Lv88xA', imageCredit: 'Towfiqu barbhuiya / Unsplash', title: '悉尼夏令时开始',
+      effectiveDate: '2026-10-04', expiresOn: '2026-10-04', audience: '在悉尼生活的同学',
+      description: '10 月 4 日凌晨 2 点拨快至 3 点。悉尼进入夏令时，和中国相差 3 小时。',
+      homeSummary: '凌晨 2:00 → 3:00\n与中国时差变为 3 小时',
+      action: '安排跨时区通话、课程或行程时，留意悉尼与中国的时差变化。',
+      source: 'https://www.nsw.gov.au/about-nsw/daylight-saving', sourceLabel: '查看 NSW 官方说明'
+    },
+    {
+      id: 'card-surcharge-2026', image: 'assets/card-payment.jpg', imageAlt: '银行卡在收款终端上进行非接触支付，刷卡消费主题配图', imagePosition: '50% 60%', imageSource: 'https://unsplash.com/photos/payment-is-being-made-with-a-credit-card-AAYpF9Vx7Ek', imageCredit: 'SumUp / Unsplash', title: '刷卡附加费新规',
+      effectiveDate: '2026-10-01', audience: '在澳大利亚使用银行卡消费的同学',
+      homeSummary: '留意结账时的刷卡附加费\n适用卡种与例外见详情',
+      description: 'eftpos、Mastercard、Visa 已实施禁收刷卡附加费规则；周末和节假日附加费不在此列。',
+      action: '结账时区分刷卡附加费与周末、节假日附加费；适用范围和例外请查看官方说明。',
+      source: 'https://www.rba.gov.au/payments-and-infrastructure/review-of-retail-payments-regulation/2026-03/conclusions-paper/faqs/', sourceLabel: '查看适用范围与例外'
+    }
+  ]
+};

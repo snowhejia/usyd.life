@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fffdf8">
+  <meta name="description" content="浏览悉尼大学校园及社团活动，按标签、关键词和时间筛选。">
+  <title>活动广场 — 悉大活动墙 USYD EVENTS WALL</title>
+  <link rel="icon" type="image/png" href="assets/usyd-events-lion-simple.png?v=1">
+  <link rel="stylesheet" href="site.css?v=4">
+  <link rel="stylesheet" href="catalog.css?v=12">
+  <script src="data.js?v=16" defer></script>
+  <script src="config.js" defer></script>
+  <script src="site.js?v=2" defer></script>
+  <script src="stats.js?v=3" defer></script>
+  <script src="events.js?v=10" defer></script>
+</head>
+<body class="events-page" data-page="events">
+  <a class="skip-link" href="#discover">跳到主要内容</a>
+  <header class="site-header" data-site-header></header>
+  <main id="discover" class="events-main page-main" aria-labelledby="discover-title">
+    <h1 id="discover-title" class="events-accessible">活动广场</h1>
+    <section class="event-tools" aria-label="查找活动">
+      <div class="window-bar mint"><span>活动筛选</span><button id="clear-filters" type="button" hidden>清除筛选 ×</button></div>
+      <div class="event-tools-body">
+        <div class="event-search-row">
+          <label class="plaza-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg><input id="event-search" type="search" placeholder="搜索活动、地点或社团名称" aria-label="搜索活动、地点或社团名称"></label>
+          <label class="plaza-period"><span>时间</span><select id="period-filter" aria-label="按时间筛选"><option value="upcoming">即将开始</option></select></label>
+        </div>
+        <div class="event-tag-row"><span class="tag-row-label">标签<small>可多选</small></span><div id="tag-filters" class="tag-filters" role="group" aria-label="活动标签，可多选"></div></div>
+      </div>
+    </section>
+    <p id="results-count" class="events-accessible" role="status" aria-live="polite"></p>
+    <div class="plaza-grid" id="event-grid"></div>
+    <section class="plaza-empty" id="empty-state" hidden aria-labelledby="empty-title"><span class="empty-pixel" aria-hidden="true">＋</span><h2 id="empty-title">暂时没有匹配的活动</h2><p id="empty-message"></p><div><button class="pill" id="reset-filters">重置筛选</button></div></section>
+  </main>
+  <footer class="site-footer page-shell" data-site-footer></footer>
+  <noscript><p class="noscript">请启用 JavaScript 查看内容。</p></noscript>
+</body>
+</html>

@@ -1,0 +1,43 @@
+name: 纠错或更新内容
+description: 更新已有活动、福利、提醒或美食，也可报告取消、失效、停业或过时信息。
+title: "[内容更新] "
+body:
+  - type: dropdown
+    id: content-type
+    attributes:
+      label: 内容类型
+      options:
+        - 校园活动
+        - 学生权益
+        - 生活提醒
+        - 美食推荐
+    validations:
+      required: true
+  - type: input
+    id: entry
+    attributes:
+      label: 标题或条目 ID
+      placeholder: "例如：Canva Campus / canva"
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: 更新内容
+      description: 说明原信息与应更新的信息。活动已取消、福利已失效或提醒已过时，也可以在这里报告。
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: 可核对的来源
+      description: 请附来源链接或遮去私人信息的通知截图。
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: 确认信息
+      options:
+        - label: 更新内容和来源可以公开展示。
+          required: true

@@ -1,0 +1,11 @@
+.DS_Store
+.sites-runtime/
+node_modules/
+.env*
+!.env.example
+
+.data/
+
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm

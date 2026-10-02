@@ -1,0 +1,38 @@
+name: Sync content discussions
+on:
+  push:
+    branches: [main]
+    paths:
+      - dist/data.js
+      - scripts/sync-discussions.mjs
+      - .github/workflows/discussions.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: write
+concurrency:
+  group: content-discussions
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm run check
+      - run: node scripts/sync-discussions.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Save discussion links
+        run: |
+          if git diff --quiet -- dist/discussions.js; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dist/discussions.js
+          git commit -m 'Update content discussion links'
+          git pull --rebase origin main
+          git push origin HEAD:main

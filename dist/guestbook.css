@@ -1,0 +1,11 @@
+.guestbook-main{padding-top:25px}
+.guestbook-window{border:2px solid var(--ink);border-radius:3px;background:var(--paper);box-shadow:4px 4px 0 var(--ink);overflow:hidden}
+.guestbook-translation{font:12px/1.4 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;border-left:1px solid #4c302b66;padding-left:9px}
+.guestbook-content{display:flex;flex-direction:column;align-items:flex-start;gap:22px;padding:38px}
+.guestbook-icon{width:48px;height:48px;shape-rendering:crispEdges}
+.guestbook-content h1{font-size:30px;line-height:1.4}
+.guestbook-intro{font-size:15px;line-height:1.8;color:var(--muted);margin-top:8px}
+.guestbook-actions{display:flex;flex-wrap:wrap;gap:14px}
+.guestbook-status{font-size:13px;line-height:1.8;color:var(--muted)}
+.guestbook-back{font-size:12px}
+@media(max-width:760px){.guestbook-main{padding-top:18px}.guestbook-content{padding:25px;gap:21px}.guestbook-content h1{font-size:27px}.guestbook-intro{font-size:14px}.guestbook-actions{width:100%}.guestbook-actions .button{flex:1 1 170px}}

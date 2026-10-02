@@ -1,0 +1,50 @@
+name: 投稿生活提醒
+description: 分享与校园生活有关的日期变化、办事提醒或实用信息。
+title: "[提醒投稿] "
+body:
+  - type: markdown
+    attributes:
+      value: "请说明影响、适用范围和需要注意的事项，附上可核对的来源。Issue 内容会公开展示。"
+  - type: input
+    id: title
+    attributes:
+      label: 提醒标题
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 提醒内容
+    validations:
+      required: true
+  - type: input
+    id: audience
+    attributes:
+      label: 适用对象或范围
+    validations:
+      required: true
+  - type: input
+    id: effective-date
+    attributes:
+      label: 生效或相关日期
+      description: 可选，填写年份；没有固定日期或尚未公布时留空。
+  - type: textarea
+    id: action
+    attributes:
+      label: 需要注意或做什么
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: 可核对的来源
+      description: 官方页面、公开通知或遮去私人信息的通知截图。
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: 确认信息
+      options:
+        - label: 以上信息可公开展示，已附可核对的来源。
+          required: true

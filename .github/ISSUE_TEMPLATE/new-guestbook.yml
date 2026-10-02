@@ -1,0 +1,12 @@
+name: 留言板
+description: 留下想法、建议，或和同学们打个招呼。
+title: "[留言] "
+body:
+  - type: textarea
+    id: message
+    attributes:
+      label: 留言
+      description: 留言会公开展示，也可以粘贴或拖入图片。
+      placeholder: 想说点什么？
+    validations:
+      required: true

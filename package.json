@@ -1,0 +1,16 @@
+{
+  "name": "usyd-events-wall",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.15.0 <25"
+  },
+  "scripts": {
+    "start": "node server/server.mjs",
+    "test": "node --test server/*.test.mjs tests/*.test.mjs",
+    "test:home": "node --test tests/home-selection.test.mjs",
+    "check": "node scripts/check-content.mjs",
+    "sync:discussions": "node scripts/sync-discussions.mjs"
+  }
+}

@@ -1,0 +1,62 @@
+name: 投稿美食推荐
+description: 推荐校内或悉大周边的餐厅、餐食和适合学生的吃饭地点。
+title: "[美食投稿] "
+body:
+  - type: markdown
+    attributes:
+      value: "请填写具体店铺与推荐菜。价格不确定可以注明待确认；请附官方页面、菜单或地图链接。"
+  - type: input
+    id: title
+    attributes:
+      label: 店名或餐厅名称
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 推荐理由
+      description: 可以分享自己的用餐体验，请不要将未体验过的内容写成亲测评价。
+    validations:
+      required: true
+  - type: input
+    id: dishes
+    attributes:
+      label: 推荐菜或餐食
+    validations:
+      required: true
+  - type: input
+    id: budget
+    attributes:
+      label: 人均预算或价格
+      description: 注明澳元、会员或优惠条件；不确定可写价格待确认。
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: 地址或校内位置
+    validations:
+      required: true
+  - type: input
+    id: hours
+    attributes:
+      label: 营业时间
+      description: 可选，知道时填写。
+  - type: input
+    id: menu
+    attributes:
+      label: 菜单链接
+      placeholder: "https://…"
+  - type: textarea
+    id: source
+    attributes:
+      label: 店铺、菜单或地图链接
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: 确认信息
+      options:
+        - label: 以上信息可公开展示，已附可核对的来源。
+          required: true

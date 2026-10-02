@@ -1,0 +1,96 @@
+name: 投稿新活动
+description: 分享一场面向悉大学生的活动，维护者核实后收录。
+title: "[活动投稿] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你一起维护悉大活动墙。Issue 会公开展示，请不要提交私人联系方式。
+        提交并不代表已收录；维护者核对后会更新网站。
+  - type: input
+    id: event-title
+    attributes:
+      label: 活动名称
+      placeholder: 例如，周五草坪音乐会
+    validations:
+      required: true
+  - type: dropdown
+    id: tags
+    attributes:
+      label: 活动标签
+      description: 至少选择一个，可多选。社团主办请加上社团标签；免费指免费入场。
+      multiple: true
+      options:
+        - 社团
+        - 社交
+        - 学习
+        - 职业
+        - 运动
+        - 公益
+        - 美食
+        - 音乐
+        - 免费
+        - 线上
+    validations:
+      required: true
+  - type: input
+    id: organiser
+    attributes:
+      label: 主办方 / 社团名称
+      description: 社团活动请填写社团全名，方便同学搜索。
+    validations:
+      required: true
+  - type: input
+    id: dates
+    attributes:
+      label: 活动日期
+      description: 写明年份；多日活动请分别说明日期。
+      placeholder: "2026-10-06"
+    validations:
+      required: true
+  - type: input
+    id: time
+    attributes:
+      label: 悉尼当地时间
+      description: 如果尚未公布，请写时间待公布。
+      placeholder: "11:00 开始，送完为止"
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: 地点
+    validations:
+      required: true
+  - type: input
+    id: price
+    attributes:
+      label: 费用与参加条件
+      description: 区分免费入场与消费项目；说明是否要求会员资格。
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 活动介绍
+    validations:
+      required: true
+  - type: input
+    id: registration
+    attributes:
+      label: 报名链接
+      placeholder: "https://…"
+  - type: textarea
+    id: source
+    attributes:
+      label: 可核对的来源
+      description: 附主办方链接、公开通知；可以拖入通知截图，请先遮去私人信息。
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: 确认信息
+      options:
+        - label: 以上信息可以公开展示，已附可核对的来源。
+          required: true

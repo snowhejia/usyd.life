@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fffdf8">
+  <meta name="description" content="收集悉尼大学及周边活动、学生权益、生活提醒与美食。">
+  <title>首页 — 悉大活动墙 USYD EVENTS WALL</title>
+  <link rel="icon" type="image/png" href="assets/usyd-events-lion-simple.png?v=1">
+  <link rel="stylesheet" href="site.css?v=4">
+  <link rel="stylesheet" href="home.css?v=20">
+  <script src="data.js?v=16" defer></script>
+  <script src="config.js" defer></script>
+  <script src="site.js?v=2" defer></script>
+  <script src="stats.js?v=3" defer></script>
+  <script src="home.js?v=18" type="module"></script>
+</head>
+<body class="home-page" data-page="home">
+  <a class="skip-link" href="#home-content">跳到主要内容</a>
+  <header class="site-header" data-site-header></header>
+  <svg class="pixel-symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="pixel-star" viewBox="0 0 18 18"><path d="M7 1h4v4h2v2h4v4h-4v2h-2v4H7v-4H5v-2H1V7h4V5h2Z" fill="#f2c55e" stroke="#4c302b" stroke-width="1.5"/></symbol>
+    <symbol id="pixel-heart" viewBox="0 0 18 18"><path d="M1 4h2V2h4v2h4V2h4v2h2v7h-2v2h-2v2h-2v2H7v-2H5v-2H3v-2H1Z" fill="#e77c78" stroke="#4c302b" stroke-width="1.5"/></symbol>
+    <symbol id="pixel-mail" viewBox="0 0 18 18"><path d="M1 3h16v12H1Z" fill="#f2c55e" stroke="#4c302b" stroke-width="1.5"/><path d="m2 4 7 6 7-6M2 14l5-5m9 5-5-5" fill="none" stroke="#4c302b" stroke-width="1.5"/></symbol>
+    <symbol id="pixel-pointer" viewBox="0 0 18 18"><path d="M3 1h2v2h2v2h2v2h2v2h2v2H9v2H7v3H3Z" fill="#fff1dc" stroke="#4c302b" stroke-width="1.5"/></symbol>
+    <symbol id="pixel-note" viewBox="0 0 18 18"><path d="M3 1h9v3h3v13H3Z" fill="#fff1dc" stroke="#4c302b" stroke-width="1.5"/><path d="M12 1v4h3M6 8h6M6 11h6M6 14h4" fill="none" stroke="#4c302b" stroke-width="1.5"/></symbol>
+  </svg>
+  <main id="home-content" class="home-main page-shell">
+    <h1 class="home-accessible-title">悉大活动墙首页</h1>
+    <div class="bento-grid">
+      <section class="bento-card campus-tile featured-carousel" id="activity-carousel" aria-label="活动轮播" aria-roledescription="轮播">
+        <div class="window-bar mint"><span><svg class="pixel-icon" aria-hidden="true"><use href="#pixel-star"></use></svg><a href="events.html">EVENTS <span class="window-translation">最近活动</span></a></span><span class="window-count" id="carousel-counter">ACTIVITIES</span></div>
+        <div class="featured-slides" id="featured-slides" aria-live="off">
+          <div class="featured-empty"><h2>查看最近活动</h2><a class="pill" href="events.html">打开活动广场 ↗</a></div>
+        </div>
+        <div class="featured-controls" id="carousel-controls" hidden>
+          <button class="carousel-arrow" id="carousel-prev" type="button" aria-label="上一场活动" aria-controls="featured-slides">←</button>
+          <div class="carousel-dots" id="carousel-dots" role="group" aria-label="选择活动"></div>
+          <button class="carousel-arrow" id="carousel-next" type="button" aria-label="下一场活动" aria-controls="featured-slides">→</button>
+          <div class="carousel-progress" id="carousel-progress" role="progressbar" aria-label="下一场活动切换进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-state="paused"><span id="carousel-progress-fill"></span></div>
+          <button class="carousel-playback" id="carousel-playback" type="button" aria-label="暂停自动轮播"><span aria-hidden="true">Ⅱ</span> 暂停</button>
+        </div>
+        <p class="carousel-announcement" id="carousel-announcement" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="bento-card upcoming-tile" aria-labelledby="upcoming-title"><div class="window-bar mint"><span><svg class="pixel-icon" aria-hidden="true"><use href="#pixel-star"></use></svg><a href="events.html">UP NEXT <span class="window-translation">活动日历</span></a></span><span class="window-count"><span id="home-event-count">03</span> 场</span></div><div class="window-body">
+        <h2 id="upcoming-title">近期活动</h2>
+        <div class="home-events" id="home-events"></div>
+        <a class="home-text-link" href="events.html">全部活动 <span aria-hidden="true">↗</span></a>
+      </div></section>
+
+      <section class="bento-card perks-tile" aria-labelledby="perks-title"><div class="window-bar yellow"><span><svg class="pixel-icon" aria-hidden="true"><use href="#pixel-heart"></use></svg><a href="benefits.html">STUDENT PERKS <span class="window-translation">学生权益</span></a></span></div><div class="window-body resource-window">
+        <a class="home-resource-photo" id="home-benefit-photo" hidden></a>
+        <h2 id="perks-title">学生权益</h2>
+        <p class="home-resource-badge" id="home-benefit-cost"></p>
+        <dl class="home-resource-facts" id="home-benefit-facts"></dl>
+        <p class="home-compact-copy" id="home-benefit-compact"></p>
+        <div class="tile-bottom"><div class="tile-actions"><a class="home-text-link" href="benefits.html">查看权益 <span aria-hidden="true">↗</span></a><a class="home-small-action" href="submit.html?type=benefit" aria-label="投稿学生权益">＋ 投稿</a></div></div>
+      </div></section>
+
+      <section class="bento-card reminder-tile" aria-labelledby="reminder-title"><div class="window-bar peach"><span><svg class="pixel-icon" aria-hidden="true"><use href="#pixel-note"></use></svg><a href="notices.html">NOTICE BOARD <span class="window-translation">生活提醒</span></a></span></div><div class="window-body resource-window">
+        <a class="home-resource-photo" id="home-notice-photo" hidden></a>
+        <h2 id="reminder-title">生活提醒</h2>
+        <time class="home-resource-badge" id="home-notice-date"></time>
+        <p class="home-notice-summary" id="home-notice"></p>
+        <p class="home-compact-copy" id="home-notice-compact"></p>
+        <div class="tile-bottom"><div class="tile-actions"><a class="home-text-link" href="notices.html">查看提醒 <span aria-hidden="true">↗</span></a><a class="home-small-action" href="submit.html?type=notice" aria-label="投稿生活提醒">＋ 投稿</a></div></div>
+      </div></section>
+
+      <section class="bento-card food-tile" aria-labelledby="home-food-title"><div class="window-bar mint"><span><svg class="pixel-icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 8h14v3h-2v3h-3v2H7v-2H4v-3H2Z" fill="#f3cf76" stroke="#4c302b" stroke-width="1.4"/><path d="M6 1v2H5v2m6-4v2h-1v2" fill="none" stroke="#4c302b" stroke-width="1.4"/></svg><a href="food.html">EATS <span class="window-translation">美食推荐</span></a></span></div><div class="window-body resource-window">
+        <a class="home-resource-photo" id="home-food-photo" hidden></a>
+        <h2 id="home-food-title">美食推荐</h2>
+        <p class="home-resource-badge" id="home-food-price"></p>
+        <p class="home-food-summary"><span id="home-food-dishes"></span><span id="home-food-location"></span></p>
+        <div class="tile-bottom"><div class="tile-actions"><a class="home-text-link" href="food.html">查看美食 <span aria-hidden="true">↗</span></a><a class="home-small-action" href="submit.html?type=food" aria-label="投稿美食推荐">＋ 投稿</a></div></div>
+      </div></section>
+      <section class="bento-card stats-tile home-stats" id="site-stats" aria-label="网站统计" data-state="loading">
+        <div class="window-bar peach"><span><svg class="pixel-icon" aria-hidden="true"><use href="#pixel-heart"></use></svg>WALL STATS <span class="window-translation">网站统计</span></span></div>
+        <div class="window-body stats-body">
+          <dl class="site-stats-list">
+            <div class="site-stat"><dt>今日访客</dt><dd data-stat="todayVisitors">—</dd></div>
+            <div class="site-stat"><dt>累计访问</dt><dd data-stat="totalVisits">—</dd></div>
+            <div class="site-stat"><dt>运行天数</dt><dd><span data-stat="runningDays">—</span><small>天</small></dd></div>
+          </dl>
+          <a class="site-guestbook" href="guestbook.html"><svg class="pixel-icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 2h14v10H9v2H7v2H5v-4H2Z" fill="#f3d27f" stroke="#4c302b" stroke-width="1.4"/><path d="M5 6h8M5 9h5" stroke="#4c302b" stroke-width="1.4"/></svg><span>留言板</span><span class="guestbook-arrow" aria-hidden="true">↗</span></a>
+          <button class="site-like" id="site-like" type="button" aria-label="为网站点赞" aria-pressed="false" disabled>
+            <svg class="pixel-icon" aria-hidden="true"><use href="#pixel-heart"></use></svg><span id="like-label">点赞</span><strong data-stat="likes">—</strong>
+          </button>
+          <div class="stats-message"><span id="stats-feedback" role="status" aria-live="polite"></span><button id="stats-retry" type="button" hidden>重试</button></div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer class="site-footer page-shell" data-site-footer></footer>
+  <noscript><p class="noscript">请启用 JavaScript 查看内容。</p></noscript>
+</body>
+</html>
