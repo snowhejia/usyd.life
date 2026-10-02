@@ -62,7 +62,7 @@ Cookie 是第一方随机标识，设为 HttpOnly 和 SameSite=Lax，HTTPS 环�
 
 | 页面 | 用途 |
 | --- | --- |
-| `index.html` | 一屏 Bento 首页，预览各板块并进入列表 |
+| `index.html` | 桌面为一屏 Bento；手机首屏展示活动轮播与日历，向下浏览其他板块 |
 | `events.html` | 活动广场，关键词、时间和多标签筛选 |
 | `benefits.html` | 学生权益与领取信息 |
 | `notices.html` | 生活提醒 |
