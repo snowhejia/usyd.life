@@ -33,9 +33,11 @@
 
 ## 评论与留言
 
-每条详情下方都有评论区，可以分享体验、提问或补充信息。点击「写评论」后使用 GitHub 回复，也支持图片。
+每条详情下方都有评论区，可以分享体验、提问或补充信息。使用 GitHub 登录后，可以直接在网站提交；自己的评论可以删除。需要附图时，可打开对应的 GitHub 讨论粘贴图片。
 
-网站建议和日常交流可以放在[留言板](https://usyd.life/guestbook.html)。投稿、评论和留言都公开保存在 [GitHub Issues](https://github.com/snowhejia/usyd.life/issues)，方便大家查阅历史记录、继续补充。
+网站建议和日常交流可以放在[留言板](https://usyd.life/guestbook.html)。登录后填写标题和留言即可发布，也可以撤回自己的留言；撤回后，GitHub 保留关闭的记录。
+
+投稿、评论和留言公开保存在 [GitHub Issues](https://github.com/snowhejia/usyd.life/issues)，方便大家查阅历史记录、继续补充。需要移除已收录内容时，可通过详情页的「纠错 / 补充」联系维护者。
 
 ## 关于
 

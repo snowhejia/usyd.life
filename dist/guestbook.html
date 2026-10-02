@@ -9,11 +9,13 @@
   <link rel="icon" type="image/png" href="assets/usyd-events-lion-simple.png?v=1">
   <link rel="stylesheet" href="site.css?v=4">
   <link rel="stylesheet" href="guestbook.css?v=3">
+  <link rel="stylesheet" href="community.css?v=1">
   <script src="data.js?v=16" defer></script>
   <script src="config.js" defer></script>
   <script src="site.js?v=2" defer></script>
   <script src="stats.js?v=3" defer></script>
-  <script src="guestbook.js?v=2" defer></script>
+  <script src="community.js?v=1" defer></script>
+  <script src="guestbook.js?v=3" defer></script>
 </head>
 <body class="guestbook-page" data-page="guestbook">
   <a class="skip-link" href="#guestbook-main">跳到主要内容</a>
@@ -31,11 +33,7 @@
           <h1 id="guestbook-title">留言板</h1>
           <p class="guestbook-intro">想法、建议，或是打个招呼。</p>
         </div>
-        <div class="guestbook-actions" id="guestbook-actions" hidden>
-          <a class="button" id="guestbook-write" target="_blank" rel="noopener noreferrer">去 GitHub 留言 <span aria-hidden="true">↗</span></a>
-          <a class="button secondary" id="guestbook-read" target="_blank" rel="noopener noreferrer">查看留言 <span aria-hidden="true">↗</span></a>
-        </div>
-        <p class="guestbook-status" id="guestbook-status" role="status">留言板暂未开放。</p>
+        <div id="guestbook-feed"></div>
         <a class="text-link guestbook-back" href="./">返回首页</a>
       </div>
     </section>

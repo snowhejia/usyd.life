@@ -1,7 +1,5 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
-import fs from 'node:fs';
-import vm from 'node:vm';
 import {selectHomeResources} from '../dist/home-selection.js';
 
 const content = overrides => ({timezone:'Australia/Sydney', benefits:[], notices:[], foods:[], ...overrides});
@@ -53,9 +51,10 @@ test('empty or fully expired modules do not fall back to stale content', () => {
 });
 
 test('the one-off clock-change reminder retires, while the ongoing rule stays available', () => {
-  const context = {window:{}};
-  vm.runInNewContext(fs.readFileSync(new URL('../dist/data.js', import.meta.url), 'utf8'), context);
-  const data = context.window.CAMPUS_DATA;
-  assert.equal(selectHomeResources(data, {now, random:() => 0}).notice.id, 'daylight-saving-2026');
-  assert.equal(selectHomeResources(data, {now:new Date('2026-10-04T13:00:00Z'), random:() => 0}).notice.id, 'card-surcharge-2026');
+  const data = content({notices:[
+    {id:'clock-change', effectiveDate:'2026-10-04', expiresOn:'2026-10-04'},
+    {id:'ongoing-rule', effectiveDate:'2026-10-01'}
+  ]});
+  assert.equal(selectHomeResources(data, {now, random:() => 0}).notice.id, 'clock-change');
+  assert.equal(selectHomeResources(data, {now:new Date('2026-10-04T13:00:00Z'), random:() => 0}).notice.id, 'ongoing-rule');
 });

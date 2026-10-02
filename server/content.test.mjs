@@ -5,6 +5,7 @@ import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {StatsStore} from './store.mjs';
 import {createSiteServer} from './server.mjs';
+import {writeTestContent} from './test-fixture.mjs';
 
 test('content likes are independent, idempotent and persistent without inflating site statistics',()=>{
   const directory=mkdtempSync(path.join(tmpdir(),'usyd-content-'));
@@ -29,13 +30,15 @@ test('content likes are independent, idempotent and persistent without inflating
   } finally {store.close();rmSync(directory,{recursive:true});}
 });
 
-test('all four detail types support cookie-scoped likes and GitHub comments; invalid writes are rejected',async()=>{
+test('all four detail types support cookie-scoped likes and GitHub comments; invalid writes are rejected',async t=>{
+  const directory=mkdtempSync(path.join(tmpdir(),'usyd-content-api-'));
+  t.after(()=>rmSync(directory,{recursive:true,force:true}));
   const calls=[];
   const commentsFetch=async url=>{
     calls.push(url);
     return Response.json([{id:101,user:{login:'reader'},created_at:'2026-10-03T01:00:00Z',body_html:'<p>Thanks!</p>'}]);
   };
-  const server=createSiteServer({database:':memory:',commentsFetch});
+  const server=createSiteServer({database:':memory:',commentsFetch,staticDir:writeTestContent(directory)});
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const base='http://127.0.0.1:'+server.address().port;
   let cookie;
@@ -61,7 +64,7 @@ test('all four detail types support cookie-scoped likes and GitHub comments; inv
       assert.match(comments.items[0].url,/^https:\/\/github\.com\/snowhejia\/usyd\.life\/issues\/\d+#issuecomment-101$/);
       assert.equal(comments.items[0].html,'<p>Thanks!</p>');
       assert.equal(comments.nextPage,null);
-      assert.equal((await post(prefix+'/comments',{text:'test'})).status,405);
+      assert.equal((await post(prefix+'/comments',{text:'test'})).status,401);
       assert.equal((await get(prefix+'/comments?page=-1')).status,400);
       assert.equal((await get(prefix+'/comments?page=1.5')).status,400);
     }

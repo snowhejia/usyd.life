@@ -9,3 +9,5 @@
 .guestbook-status{font-size:13px;line-height:1.8;color:var(--muted)}
 .guestbook-back{font-size:12px}
 @media(max-width:760px){.guestbook-main{padding-top:18px}.guestbook-content{padding:25px;gap:21px}.guestbook-content h1{font-size:27px}.guestbook-intro{font-size:14px}.guestbook-actions{width:100%}.guestbook-actions .button{flex:1 1 170px}}
+
+#guestbook-feed{grid-column:1/-1;width:100%;min-width:0}.guestbook-content{align-items:start}

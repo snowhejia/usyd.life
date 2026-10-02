@@ -19,8 +19,11 @@ export async function prepareSubmission({directory,repository,issue,reviewer,dat
   const data=readData(directory),hash=submissionHash(issue),auditPath='content/submissions/'+issue.number+'.json';
   const auditFile=path.join(directory,auditPath);
   const previous=fs.existsSync(auditFile)?JSON.parse(fs.readFileSync(auditFile,'utf8')):undefined;
+  const assertNotDeleted=({type,id})=>{if(fs.existsSync(path.join(directory,'content/deletions/'+type+'--'+id+'.json')))throw new Error('这条内容已经删除，不能通过旧投稿重新收录。需要恢复时请联系维护者。');};
+  if(previous)assertNotDeleted(previous);
   if(previous?.hash===hash)return {changed:false,...previous,files:[]};
   const parsed=parseSubmission(issue,data);
+  assertNotDeleted(parsed);
   if(previous&&(previous.type!==parsed.type||previous.id!==parsed.id))throw new Error('已收录投稿不能更改内容类型或目标 ID，请新建投稿。');
   if(!parsed.updating&&!previous) {
     const duplicate=data[collections[parsed.type]].find(item=>item.id===parsed.id||(item.title.toLowerCase().trim()===parsed.patch.title.toLowerCase().trim()&&item.source===parsed.patch.source&&(parsed.type!=='event'||item.startDate===parsed.patch.startDate)&&(parsed.type!=='food'||item.address===parsed.patch.address)));

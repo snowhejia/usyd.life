@@ -140,8 +140,8 @@ test('HTTP integration: cookies deduplicate concurrent page loads, retries and r
     assert.equal((await fetch(base+'/.data/stats.sqlite3')).status,404);
     assert.equal((await fetch(base+'/server/server.mjs')).status,404);
     assert.equal((await fetch(base+'/api/health')).status,200);
-    assert.equal((await fetch(base+'/api/guestbook')).status,404);
-    assert.equal((await post('/api/guestbook',{nickname:'test',message:'test',requestId:randomUUID()},cookie)).status,404);
+    assert.equal((await fetch(base+'/api/guestbook?page=-1')).status,400);
+    assert.equal((await post('/api/guestbook',{nickname:'test',message:'test',requestId:randomUUID()},cookie)).status,401);
     assert.equal((await fetch(base+'/api/guestbook/'+randomUUID(),{method:'DELETE',headers:{Cookie:cookie,Origin:base}})).status,404);
   } finally { await new Promise(resolve=>server.close(resolve)); }
 });

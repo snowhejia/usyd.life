@@ -7,6 +7,9 @@ import {createHash,createHmac,randomUUID,timingSafeEqual} from 'node:crypto';
 import {StatsStore} from './store.mjs';
 import {runInNewContext} from 'node:vm';
 import {GitHubComments} from './comments.mjs';
+import {GitHubAuth} from './auth.mjs';
+import {GitHubCommunity} from './community.mjs';
+import {collections,contentHash} from './content-identity.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.gif':'image/gif','.svg':'image/svg+xml','.ico':'image/x-icon'};
@@ -18,8 +21,7 @@ function json(res,status,payload) {
   res.end(body);
 }
 function fail(status,message) { return Object.assign(new Error(message),{status}); }
-async function readJson(req) {
-  const limit=1024;
+async function readJson(req,limit=1024) {
   if (!/^application\/json(?:;|$)/i.test(req.headers['content-type'] || '')) throw fail(415,'请使用 JSON 请求。');
   if (Number(req.headers['content-length'])>limit) throw fail(413,'请求过大。');
   const chunks=[];
@@ -47,38 +49,76 @@ function visitorFor(req,res,secret) {
   }
   return createHash('sha256').update(id).digest('hex');
 }
-function checkOrigin(req) {
+function checkOrigin(req,configuredOrigin) {
   if (req.headers['sec-fetch-site']==='cross-site') throw fail(403,'不允许跨站请求。');
   if (req.headers.origin) {
     let origin;
     try { origin=new URL(req.headers.origin); } catch { throw fail(403,'来源不正确。'); }
-    const expectedHost=process.env.PUBLIC_ORIGIN ? new URL(process.env.PUBLIC_ORIGIN).host : req.headers.host;
+    const expectedHost=(configuredOrigin || process.env.PUBLIC_ORIGIN) ? new URL(configuredOrigin || process.env.PUBLIC_ORIGIN).host : req.headers.host;
     if (origin.host!==expectedHost || !['http:','https:'].includes(origin.protocol)) throw fail(403,'不允许跨站请求。');
   }
 }
 
-export function createSiteServer({database=path.join(process.env.DATA_DIR || path.join(root,'.data'),'stats.sqlite3'),staticDir=path.join(root,'dist'),clock,commentsFetch}={}) {
+export function createSiteServer({database=path.join(process.env.DATA_DIR || path.join(root,'.data'),'stats.sqlite3'),staticDir=path.join(root,'dist'),clock,commentsFetch,githubFetch,authOptions}={}) {
   const content={window:{}};
   runInNewContext(readFileSync(path.join(staticDir,'data.js'),'utf8'),content,{timeout:1000,contextCodeGeneration:{strings:false,wasm:false}});
   runInNewContext(readFileSync(path.join(staticDir,'discussions.js'),'utf8'),content,{timeout:1000,contextCodeGeneration:{strings:false,wasm:false}});
-  const contentIds=new Set(Object.entries({event:'events',benefit:'benefits',notice:'notices',food:'foods'}).flatMap(([type,collection])=>(content.window.CAMPUS_DATA?.[collection] || []).map(item=>type+':'+item.id)));
+  const items=new Map(Object.entries(collections).flatMap(([type,collection])=>(content.window.CAMPUS_DATA?.[collection] || []).map(item=>[type+':'+item.id,item])));
+  const contentIds=new Set(items.keys());
   const discussions=content.window.CAMPUS_DISCUSSIONS;
   const comments=new GitHubComments(discussions.repository,{fetcher:commentsFetch});
   const store=new StatsStore(database,clock);
+  const auth=new GitHubAuth(store.db,{fetcher:githubFetch,...authOptions});
+  const community=new GitHubCommunity({repository:discussions.repository,auth,comments,items,discussions:discussions.items,fetcher:githubFetch,clock:auth.clock});
   const server=http.createServer({requestTimeout:10000,headersTimeout:10000,maxHeaderSize:16384},async(req,res)=>{
     res.setHeader('X-Content-Type-Options','nosniff');
     res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');
     try {
       const url=new URL(req.url,'http://local');
       if (url.pathname==='/api/health' && req.method==='GET') return json(res,200,{ok:true});
+      if(url.pathname.startsWith('/auth/')) {
+        res.setHeader('Cache-Control','no-store');
+        if(req.method!=='GET')throw fail(405,'不支持该请求方式。');
+        const destination=url.pathname==='/auth/github/start'?auth.start(req,res,url.searchParams.get('returnTo')):url.pathname==='/auth/github/callback'?await auth.callback(req,res,url):null;
+        if(!destination)throw fail(404,'页面不存在。');
+        res.writeHead(303,{Location:destination});return res.end();
+      }
       if (url.pathname.startsWith('/api/')) {
-        checkOrigin(req);
-        const target=url.pathname.match(/^\/api\/content\/(event|benefit|notice|food)\/([a-z0-9]+(?:-[a-z0-9]+)*)\/(likes|comments)$/);
+        checkOrigin(req,auth.origin);
+        if(url.pathname==='/api/session' && req.method==='GET') {
+          const session=auth.session(req);
+          const canManage=session?await community.canManage(session):false;
+          const current=auth.session(req);
+          return json(res,200,{configured:auth.configured,user:current?.user || null,csrf:current?.csrf || null,canManage:!!current&&canManage});
+        }
+        if(url.pathname==='/api/logout' && req.method==='POST') {auth.logout(req,res);return json(res,200,{ok:true});}
+        if(url.pathname==='/api/guestbook') {
+          if(req.method==='POST')return json(res,201,await community.postGuestbook(auth.require(req),await readJson(req,24000)));
+          if(req.method!=='GET')throw fail(405,'不支持该请求方式。');
+          const page=Number(url.searchParams.get('page') || 1);
+          if(!Number.isSafeInteger(page)||page<1||page>100)throw fail(400,'页码无效。');
+          return json(res,200,await community.guestbook(page,url.searchParams.get('refresh')==='1'));
+        }
+        const guest=url.pathname.match(/^\/api\/guestbook\/([1-9]\d*)$/);
+        if(guest && req.method==='DELETE')return json(res,200,await community.withdrawGuestbook(auth.require(req),Number(guest[1])));
+        const target=url.pathname.match(/^\/api\/content\/(event|benefit|notice|food)\/([a-z0-9]+(?:-[a-z0-9]+)*)\/(likes|comments|manage|delete)(?:\/([1-9]\d*))?$/);
         if (target) {
-          const [,type,id,action]=target;
+          const [,type,id,action,commentId]=target;
           if (!contentIds.has(type+':'+id)) return json(res,404,{error:'没有找到这条内容。'});
+          if(commentId) {
+            if(action!=='comments'||req.method!=='DELETE')throw fail(405,'不支持该请求方式。');
+            return json(res,200,await community.deleteComment(auth.require(req),type,id,Number(commentId)));
+          }
+          if(action==='manage' || action==='delete') {
+            const session=action==='delete'?auth.require(req):auth.session(req);
+            if(!session)throw fail(401,'请先使用 GitHub 登录。');
+            if(action==='manage' && req.method==='GET'){await community.requireManager(session);return json(res,200,{hash:contentHash(items.get(type+':'+id))});}
+            if(action==='delete' && req.method==='POST')return json(res,202,await community.deleteContent(session,type,id,await readJson(req,6000)));
+            throw fail(405,'不支持该请求方式。');
+          }
           if (action==='comments') {
-            if (req.method!=='GET') return json(res,405,{error:'请在 GitHub 发表评论。'});
+            if(req.method==='POST')return json(res,201,await community.postComment(auth.require(req),type,id,await readJson(req,24000)));
+            if (req.method!=='GET') return json(res,405,{error:'不支持该请求方式。'});
             const issue=discussions.items[type+':'+id];
             if (!Number.isSafeInteger(issue) || issue<1) return json(res,404,{error:'评论区准备中。'});
             const page=Number(url.searchParams.get('page') || 1);
@@ -110,11 +150,12 @@ export function createSiteServer({database=path.join(process.env.DATA_DIR || pat
       let info,actual;
       try { [info,actual]=await Promise.all([stat(filename),realpath(filename)]); } catch { throw fail(404,'页面不存在。'); }
       if (!info.isFile() || !actual.startsWith(path.resolve(staticDir)+path.sep) || !mime[path.extname(filename)]) throw fail(404,'页面不存在。');
-      const etag=`W/"${info.size}-${Math.trunc(info.mtimeMs)}"`;
+      const missing=relative==='/detail.html' && url.searchParams.has('id') && !contentIds.has((url.searchParams.get('type') || 'event')+':'+url.searchParams.get('id'));
+      const etag=`W/"${info.size}-${Math.trunc(info.mtimeMs)}${missing?'-missing':''}"`;
       res.setHeader('ETag',etag);
       res.setHeader('Cache-Control','no-cache');
       if (req.headers['if-none-match']===etag) { res.writeHead(304); return res.end(); }
-      res.writeHead(200,{'Content-Type':mime[path.extname(filename)],'Content-Length':info.size});
+      res.writeHead(missing?404:200,{'Content-Type':mime[path.extname(filename)],'Content-Length':info.size});
       if (req.method==='HEAD') return res.end();
       const stream=createReadStream(filename);
       stream.on('error',()=>res.destroy());

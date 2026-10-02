@@ -4,6 +4,7 @@ export class GitHubComments {
     Object.assign(this,{repository,fetcher,clock,token,ttl});
     this.cache=new Map();
     this.pending=new Map();
+    this.revision=new Map();
     this.backoffUntil=0;
   }
   async read(issue,page=1,refresh=false) {
@@ -11,14 +12,21 @@ export class GitHubComments {
     const previous=this.cache.get(key);
     if (previous && previous.expires>this.clock() && (!refresh || this.clock()-previous.savedAt<30000)) return previous.data;
     if (this.pending.has(key)) return this.pending.get(key);
+    const revision=this.revision.get(issue) || 0;
     const request=this.load(issue,page,previous).then(data=>{
+      if(revision!==(this.revision.get(issue) || 0))return this.read(issue,page,true);
       this.cache.delete(key);
       this.cache.set(key,{data,savedAt:this.clock(),expires:this.clock()+(data.stale?30000:this.ttl)});
       if (this.cache.size>200) this.cache.delete(this.cache.keys().next().value);
       return data;
-    }).finally(()=>this.pending.delete(key));
+    }).finally(()=>{if(this.pending.get(key)===request)this.pending.delete(key);});
     this.pending.set(key,request);
     return request;
+  }
+  invalidate(issue) {
+    this.revision.set(issue,(this.revision.get(issue) || 0)+1);
+    for(const key of this.cache.keys())if(key.startsWith(issue+':'))this.cache.delete(key);
+    for(const key of this.pending.keys())if(key.startsWith(issue+':'))this.pending.delete(key);
   }
   async load(issue,page,previous) {
     try {
@@ -40,7 +48,7 @@ export class GitHubComments {
       if (!Array.isArray(records)) throw new Error('Invalid GitHub response');
       return {
         items:records.filter(item=>Number.isSafeInteger(item.id)&&!item.minimized).map(item=>({
-          id:item.id,author:String(item.user?.login || 'GitHub 用户'),createdAt:item.created_at,
+          id:item.id,author:String(item.user?.login || 'GitHub 用户'),userId:item.user?.id,createdAt:item.created_at,
           html:String(item.body_html || ''),text:String(item.body || ''),
           url:'https://github.com/'+this.repository+'/issues/'+issue+'#issuecomment-'+item.id
         })),
