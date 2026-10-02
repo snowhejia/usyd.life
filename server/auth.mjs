@@ -11,7 +11,7 @@ function setCookie(res,name,value,seconds,secure) {
   res.setHeader('Set-Cookie',[...(Array.isArray(existing)?existing:[existing]),`${name}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${seconds}${secure?'; Secure':''}`]);
 }
 export function returnPath(value) {
-  if(typeof value!=='string' || !/^\/(?:detail|guestbook)\.html(?:\?[^#]*)?$/.test(value) || /[\\\r\n]/.test(value))return '/guestbook.html';
+  if(typeof value!=='string' || !/^\/(?:detail|guestbook|submit)\.html(?:\?[^#]*)?$/.test(value) || /[\\\r\n]/.test(value))return '/guestbook.html';
   return value.slice(0,1000);
 }
 export class GitHubAuth {

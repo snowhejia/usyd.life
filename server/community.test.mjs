@@ -8,6 +8,7 @@ import path from 'node:path';
 import {createSiteServer} from './server.mjs';
 import {returnPath} from './auth.mjs';
 import {writeTestContent} from './test-fixture.mjs';
+import {parseSubmission} from '../scripts/lib/issue-content.mjs';
 
 async function fixture(t,{persist=false}={}) {
   let now=Date.now(),admin=true,failAfterWrite=false,revoked=false;
@@ -48,6 +49,7 @@ async function fixture(t,{persist=false}={}) {
   await start();t.after(async()=>{await new Promise(resolve=>server.close(resolve));rmSync(dir,{recursive:true,force:true});});
   const get=(route,cookie='')=>fetch(base+route,{headers:{Cookie:cookie},redirect:'manual'});
   const write=(route,body,session={},method='POST',headers={})=>fetch(base+route,{method,headers:{'Content-Type':'application/json',Origin:'http://localhost',Cookie:session.cookie || '','X-CSRF-Token':session.csrf || '',...headers},body:body===undefined?undefined:JSON.stringify(body)});
+  const upload=(bytes,session={},requestId=randomUUID())=>fetch(base+'/api/submissions/images',{method:'POST',headers:{'Content-Type':'application/octet-stream',Origin:'http://localhost',Cookie:session.cookie || '','X-CSRF-Token':session.csrf || '','X-Upload-Id':requestId},body:bytes});
   async function begin(returnTo='/guestbook.html') {const response=await get('/auth/github/start?returnTo='+encodeURIComponent(returnTo));return {response,oauth:new URL(response.headers.get('location')),cookie:response.headers.getSetCookie()[0].split(';')[0]};}
   async function login(name='student') {
     const login=await begin();
@@ -55,7 +57,7 @@ async function fixture(t,{persist=false}={}) {
     const cookie=response.headers.getSetCookie().find(value=>value.startsWith('usyd_session=')).split(';')[0];
     const session=await (await get('/api/session',cookie)).json();return {...session,cookie};
   }
-  return {get,write,begin,login,comments,issues,calls,database,users,fetcher,get exchange(){return lastExchange;},tick:()=>now+=6000,revoke:()=>revoked=true,demote:()=>admin=false,timeout:()=>failAfterWrite=true,expire:()=>now+=28800001,restart:async()=>{await new Promise(resolve=>server.close(resolve));await start();}};
+  return {get,write,upload,begin,login,comments,issues,calls,database,users,fetcher,get exchange(){return lastExchange;},tick:()=>now+=6000,revoke:()=>revoked=true,demote:()=>admin=false,timeout:()=>failAfterWrite=true,expire:()=>now+=28800001,restart:async()=>{await new Promise(resolve=>server.close(resolve));await start();}};
 }
 test('GitHub login binds a single-use state and PKCE, encrypts persistent sessions, and rejects open redirects',async t=>{
   const f=await fixture(t,{persist:true}),login=await f.begin('https://evil.example');
@@ -72,6 +74,9 @@ test('GitHub login binds a single-use state and PKCE, encrypts persistent sessio
   await f.restart();assert.equal((await (await f.get('/api/session',session.cookie)).json()).user.id,101);
   await f.write('/api/logout',{},session);assert.equal((await (await f.get('/api/session',session.cookie)).json()).user,null);
   for(const route of ['//evil.example','/\\evil.example','/detail.html\r\nLocation: bad','/auth/github/start'])assert.equal(returnPath(route),'/guestbook.html');
+  const submission=await f.begin('/submit.html?type=food&kind=update&id=kura-ichi');
+  const returned=await f.get('/auth/github/callback?code=student&state='+submission.oauth.searchParams.get('state'),submission.cookie);
+  assert.equal(returned.headers.get('location'),'/submit.html?type=food&kind=update&id=kura-ichi');
 });
 test('anonymous, cross-origin, missing-CSRF and expired sessions cannot submit or delete',async t=>{
   const f=await fixture(t),s=await f.login();
@@ -144,4 +149,72 @@ test('revoking the GitHub token invalidates the server session and prevents furt
   const current=await (await f.get('/api/session',s.cookie)).json();
   assert.equal(current.user,null);assert.equal(current.configured,true);
   assert.equal((await f.write('/api/guestbook',{title:'test',text:'test',requestId:randomUUID()},s)).status,401);
+});
+
+const submission=(prefix,values)=>({title:'['+prefix+'] 测试投稿',body:Object.entries({标题:'测试投稿',介绍:'同学一起维护的信息。',...values,来源:'https://example.org/source'}).map(([key,value])=>'### '+key+'\n'+value).join('\n\n')+'\n\n---\n- [x] 信息及配图可公开展示，已附可核对的来源。',requestId:randomUUID()});
+const eventFields={活动标签:'#社团、#免费',主办方:'Test Club',日期:'2026-10-15',悉尼当地时间:'10:30–15:30',地点:'J12',费用:'免费'};
+const foodFields={'推荐菜 / 餐食':'乌冬面','人均预算 / 价格':'A$12','地址 / 校内位置':'Camperdown'};
+test('all four structured submissions stay on site and become unapproved Issues attributed to the signed-in user',async t=>{
+  const f=await fixture(t),s=await f.login();
+  const samples=[
+    submission('活动投稿',eventFields),
+    submission('福利投稿',{福利提供方:'大学',适用对象:'学生',费用与限制:'免费',有效期:'长期有效，以官方政策为准','领取 / 使用方式':'出示学生证'}),
+    submission('提醒投稿',{'适用对象 / 范围':'同学',需要注意或做什么:'留意开放时间'}),
+    submission('美食投稿',foodFields)
+  ];
+  for(const sample of samples) {
+    f.tick();const response=await f.write('/api/submissions',{...sample,labels:['审核通过']},s),value=await response.json();
+    assert.equal(response.status,201);assert.equal(value.pending,true);assert.match(value.url,/github\.com\/snowhejia\/usyd\.life\/issues\/\d+$/);
+    const created=f.issues.find(issue=>issue.number===value.number);
+    assert.deepEqual(created.labels,['投稿']);assert.equal(created.user.id,101);
+    assert.equal(parseSubmission(created,{tags:{club:'社团',free:'免费'},events:[],benefits:[],notices:[],foods:[]}).updating,false);
+    assert.equal((await (await f.write('/api/submissions',sample,s)).json()).number,value.number);
+  }
+  assert.equal(f.issues.length,4);
+});
+test('submission writes reject missing auth, CSRF, invalid content and stale corrections; network retries never create a second Issue',async t=>{
+  const f=await fixture(t,{persist:true}),s=await f.login(),body=submission('活动投稿',eventFields);
+  assert.equal((await f.write('/api/submissions',body)).status,401);
+  assert.equal((await f.write('/api/submissions',body,s,'POST',{Origin:'https://evil.example'})).status,403);
+  assert.equal((await f.write('/api/submissions',body,s,'POST',{'X-CSRF-Token':''})).status,403);
+  for(const bad of [
+    {...body,title:'[留言] test'},
+    {...body,body:body.body.replace('[x]','[ ]')},
+    {...body,body:body.body.replace('2026-10-15','2026-02-30')},
+    {...body,body:body.body+'\n### 标题\n重复栏目'},
+    {...body,body:'x'.repeat(25001)}
+  ])assert.equal((await f.write('/api/submissions',{...bad,requestId:randomUUID()},s)).status,400);
+  assert.equal(f.issues.length,0);
+  const correction=submission('活动更新',{...eventFields,'条目 ID':'gelato',更新说明:'补充时间'});
+  assert.equal((await f.write('/api/submissions',correction,s)).status,400);
+  correction.body+='\n<!-- usyd-base:'+createHash('sha256').update(JSON.stringify({id:'gelato',title:'Test event'})).digest('hex')+' -->';
+  assert.equal((await f.write('/api/submissions',correction,s)).status,201);
+  f.tick();f.timeout();
+  assert.equal((await f.write('/api/submissions',body,s)).status,503);
+  await f.restart();
+  assert.equal((await f.write('/api/submissions',body,s)).status,201);
+  assert.equal(f.issues.length,2);
+  assert.equal((await f.write('/api/submissions',{...body,title:'[活动投稿] 改名'},s)).status,409);
+});
+test('website images persist, stay private until submission, enforce ownership and deduplicate upload retries',async t=>{
+  const f=await fixture(t,{persist:true}),s=await f.login(),other=await f.login('maintainer');
+  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+yTioAAAAASUVORK5CYII=','base64');
+  assert.equal((await f.upload(png)).status,401);
+  assert.equal((await f.upload(Buffer.from('<svg onload="alert(1)"></svg>'),s)).status,400);
+  assert.equal((await f.upload(Buffer.alloc(5*1024*1024+1),s)).status,413);
+  const requestId=randomUUID(),response=await f.upload(png,s,requestId),image=await response.json();
+  assert.equal(response.status,201);assert.deepEqual(await (await f.upload(png,s,requestId)).json(),image);
+  assert.equal((await f.get(image.previewUrl)).status,404);
+  assert.equal((await f.get(image.previewUrl,other.cookie)).status,404);
+  assert.deepEqual(Buffer.from(await (await f.get(image.previewUrl,s.cookie)).arrayBuffer()),png);
+  await f.restart();assert.equal((await f.get(image.previewUrl,s.cookie)).status,200);
+  const body=submission('美食投稿',{...foodFields,配图:'![封面]('+image.url+')'});
+  assert.equal((await f.write('/api/submissions',body,other)).status,403);
+  assert.equal((await f.get(image.previewUrl)).status,404);
+  assert.equal((await f.write('/api/submissions',body,s)).status,201);
+  const publicImage=await f.get(image.previewUrl);assert.equal(publicImage.status,200);assert.equal(publicImage.headers.get('content-type'),'image/png');
+  assert.deepEqual(Buffer.from(await publicImage.arrayBuffer()),png);
+  assert.match(f.issues[0].body,/https:\/\/usyd\.life\/media\/submissions\//);
+  f.tick();
+  assert.equal((await f.write('/api/submissions',submission('美食投稿',{...foodFields,配图:'![](https://usyd.life/media/submissions/11111111-1111-4111-8111-111111111111.png)'}),s)).status,400);
 });

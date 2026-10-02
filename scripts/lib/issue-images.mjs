@@ -4,10 +4,11 @@ import path from 'node:path';
 const maxSize=5*1024*1024;
 export function attachmentUrl(value,redirect=false) {
   let url;try{url=new URL(value);}catch{throw new Error('配图链接无效。');}
-  if(url.protocol!=='https:'||url.username||url.password||url.port||url.hash)throw new Error('配图请使用 GitHub 上传后的 HTTPS 图片链接。');
+  if(url.protocol!=='https:'||url.username||url.password||url.port||url.hash)throw new Error('配图请使用网站或 GitHub 上传后的 HTTPS 图片链接。');
   const direct=(url.hostname==='github.com'&&/^\/user-attachments\/assets\/[a-f0-9-]{36}$/.test(url.pathname)) || (url.hostname==='user-images.githubusercontent.com'&&/^\/\d+\/[^/]+$/.test(url.pathname));
+  const uploaded=url.origin==='https://usyd.life' && !url.search && /^\/media\/submissions\/[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}\.(png|jpg|gif|webp)$/.test(url.pathname);
   const redirected=redirect&&['private-user-images.githubusercontent.com','github-production-user-asset-6210df.s3.amazonaws.com','github-production-user-asset-6210df.s3.us-east-1.amazonaws.com'].includes(url.hostname);
-  if(!direct&&!redirected)throw new Error('请把图片直接上传到 GitHub Issue，再使用生成的图片链接。');
+  if(!direct&&!uploaded&&!redirected)throw new Error('请使用网站或 GitHub 上传的图片。');
   return url;
 }
 export function imageExtension(buffer) {
@@ -28,7 +29,7 @@ export async function saveImage(value,directory,{fetcher=fetch}={}) {
     }
     break;
   }
-  if(!response.ok)throw new Error('无法读取配图，请确认图片已公开上传到此 GitHub Issue。');
+  if(!response.ok)throw new Error('无法读取配图，请确认图片已随投稿提交并可公开访问。');
   if(Number(response.headers.get('content-length'))>maxSize){await response.body?.cancel();throw new Error('每张配图不能超过 5 MB。');}
   const chunks=[];let size=0;
   try {for await(const chunk of response.body){size+=chunk.length;if(size>maxSize)throw new Error('每张配图不能超过 5 MB。');chunks.push(chunk);}}

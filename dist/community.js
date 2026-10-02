@@ -3,8 +3,8 @@
   const escape=window.AfterClass.escape;
   let auth={configured:false,user:null,csrf:null,canManage:false};
   const listeners=new Set();
-  async function request(url,{method='GET',body}={}) {
-    const response=await fetch(url,{method,credentials:'same-origin',cache:'no-store',headers:method==='GET'?{}:{'Content-Type':'application/json','X-CSRF-Token':auth.csrf || ''},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(16000)});
+  async function request(url,{method='GET',body,raw=false,requestId}={}) {
+    const response=await fetch(url,{method,credentials:'same-origin',cache:'no-store',headers:method==='GET'?{}:{'Content-Type':raw?'application/octet-stream':'application/json','X-CSRF-Token':auth.csrf || '',...(requestId?{'X-Upload-Id':requestId}:{})},body:body===undefined?undefined:raw?body:JSON.stringify(body),signal:AbortSignal.timeout(raw?60000:16000)});
     const data=await response.json();
     if(!response.ok) {
       if(response.status===401){auth={...auth,user:null,csrf:null,canManage:false};listeners.forEach(fn=>fn());}
@@ -13,6 +13,29 @@
     return data;
   }
   const ready=request('/api/session').then(data=>{auth=data;listeners.forEach(fn=>fn());}).catch(()=>{});
+  function subscribe(listener) {
+    listeners.add(listener);ready.then(listener);
+    return ()=>listeners.delete(listener);
+  }
+  function authControl(container,{action='发表评论',beforeLogin=()=>{},onError=()=>{},githubUrl}={}) {
+    container.classList.add('community-auth');
+    container.textContent='正在读取登录状态…';
+    return subscribe(()=>{
+      if(auth.user) {
+        container.innerHTML='<span>已登录 <strong>@'+escape(auth.user.login)+'</strong></span><button class="text-link" type="button">退出登录</button>';
+        container.querySelector('button').onclick=async()=>{
+          try{await request('/api/logout',{method:'POST',body:{}});auth={...auth,user:null,csrf:null,canManage:false};listeners.forEach(fn=>fn());}
+          catch(error){onError(error);}
+        };
+      } else if(auth.configured) {
+        const href='/auth/github/start?returnTo='+encodeURIComponent(location.pathname+location.search);
+        container.innerHTML='<a class="button" href="'+escape(href)+'">使用 GitHub 登录</a><p>登录后'+escape(action)+'。</p>';
+        container.querySelector('a').addEventListener('click',beforeLogin);
+      } else {
+        container.innerHTML='<p>站内登录暂未开放。</p>'+(githubUrl?'<a class="text-link" target="_blank" rel="noopener noreferrer" href="'+escape(githubUrl)+'">前往 GitHub ↗</a>':'');
+      }
+    });
+  }
   function safeUrl(value) {
     try {const url=new URL(value);return ['https:','http:'].includes(url.protocol)&&!url.username&&!url.password?url.href:'';} catch{return '';}
   }
@@ -58,18 +81,8 @@
       try{sessionStorage.setItem(key,JSON.stringify(draft));}catch{}
     }
     form.addEventListener('input',save);
-    function renderAuth() {
-      form.hidden=!auth.user;
-      if(auth.user) {
-        authBox.innerHTML='<span>以 <strong>@'+escape(auth.user.login)+'</strong> 的身份发布</span><button class="text-link" type="button">退出登录</button>';
-        authBox.querySelector('button').onclick=async()=>{try{await request('/api/logout',{method:'POST',body:{}});auth={...auth,user:null,csrf:null,canManage:false};listeners.forEach(fn=>fn());}catch(error){status.textContent=error.message;}};
-      } else {
-        const href='/auth/github/start?returnTo='+encodeURIComponent(location.pathname+location.search);
-        authBox.innerHTML=auth.configured?'<a class="button" href="'+escape(href)+'">使用 GitHub 登录</a><p>登录后'+(guestbook?'发布留言':'发表评论')+'。</p>':'<p>站内登录暂未开放。</p><a class="text-link" target="_blank" rel="noopener noreferrer" href="'+escape(githubUrl)+'">前往 GitHub ↗</a>';
-        authBox.querySelector('a')?.addEventListener('click',save);
-      }
-    }
-    listeners.add(renderAuth);ready.then(renderAuth);
+    authControl(authBox,{action:guestbook?'发布留言':'发表评论',beforeLogin:save,onError:error=>status.textContent=error.message,githubUrl});
+    subscribe(()=>{form.hidden=!auth.user;});
     const login=new URLSearchParams(location.search).get('login');
     if(login)status.textContent=login==='cancelled'?'已取消登录，草稿已保留。':'登录未完成，请重试，草稿已保留。';
     form.onsubmit=async event=>{
@@ -147,5 +160,5 @@
       finally{button.disabled=false;}
     };
   }
-  window.Community={feed,manage,commentBody,ready};
+  window.Community={feed,manage,commentBody,ready,request,authControl,subscribe,session:()=>auth};
 })();

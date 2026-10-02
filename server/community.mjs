@@ -1,5 +1,7 @@
 import {fail,digest} from './auth.mjs';
 import {contentHash,deletionLabel} from './content-identity.mjs';
+import {parseSubmission} from '../scripts/lib/issue-content.mjs';
+import {attachmentUrl} from '../scripts/lib/issue-images.mjs';
 
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const text=(value,max,label)=>{
@@ -7,8 +9,8 @@ const text=(value,max,label)=>{
   return value.trim();
 };
 export class GitHubCommunity {
-  constructor({repository,auth,comments,items,discussions,fetcher=fetch,clock=()=>Date.now(),readToken=process.env.GITHUB_READ_TOKEN || ''}) {
-    Object.assign(this,{repository,auth,comments,items,discussions,fetcher,clock,readToken});
+  constructor({repository,auth,comments,items,discussions,data,uploads,fetcher=fetch,clock=()=>Date.now(),readToken=process.env.GITHUB_READ_TOKEN || ''}) {
+    Object.assign(this,{repository,auth,comments,items,discussions,data,uploads,fetcher,clock,readToken});
     this.running=new Set();this.guestCache=new Map();this.generation=0;
   }
   async api(route,{session,method='GET',body}={}) {
@@ -95,6 +97,21 @@ export class GitHubCommunity {
       return this.record(data);
     },marker=>this.findOwnIssue(session,marker));
     this.guestCache.clear();this.generation++;return result;
+  }
+  async postSubmission(session,body) {
+    const title=text(body.title,200,'投稿标题'),message=text(body.body,25000,'投稿内容');
+    const result=await this.once(session,body.requestId,'submission',{title,body:message},async marker=>{
+      let uploaded;
+      try {
+        const parsed=parseSubmission({number:1,title,body:message},this.data);
+        for(const image of parsed.images)attachmentUrl(image);
+        uploaded=this.uploads.ownNames(session,parsed.images);
+      } catch(error) {throw Object.assign(fail(error.status || 400,error.message),{definitive:true});}
+      this.uploads.publish(uploaded);
+      const {data}=await this.api('/issues',{session,method:'POST',body:{title,body:message+'\n\n'+marker,labels:['投稿']}});
+      return this.record(data);
+    },marker=>this.findOwnIssue(session,marker));
+    return {number:result.number,url:result.url,pending:true};
   }
   async findOwnIssue(session,marker) {
     const {data}=await this.api('/issues?state=all&creator='+encodeURIComponent(session.user.login)+'&sort=created&direction=desc&per_page=100',{session});

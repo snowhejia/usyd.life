@@ -10,6 +10,7 @@ import {GitHubComments} from './comments.mjs';
 import {GitHubAuth} from './auth.mjs';
 import {GitHubCommunity} from './community.mjs';
 import {collections,contentHash} from './content-identity.mjs';
+import {SubmissionUploads,uploadLimit} from './submission-uploads.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.gif':'image/gif','.svg':'image/svg+xml','.ico':'image/x-icon'};
@@ -23,6 +24,14 @@ function json(res,status,payload) {
 function fail(status,message) { return Object.assign(new Error(message),{status}); }
 async function readJson(req,limit=1024) {
   if (!/^application\/json(?:;|$)/i.test(req.headers['content-type'] || '')) throw fail(415,'请使用 JSON 请求。');
+  const bytes=await readBytes(req,limit);
+  try {
+    const body=JSON.parse(bytes.toString('utf8'));
+    if (!body || typeof body!=='object' || Array.isArray(body)) throw new Error();
+    return body;
+  } catch { throw fail(400,'请求格式有误。'); }
+}
+async function readBytes(req,limit) {
   if (Number(req.headers['content-length'])>limit) throw fail(413,'请求过大。');
   const chunks=[];
   let length=0;
@@ -31,11 +40,7 @@ async function readJson(req,limit=1024) {
     if (length>limit) throw fail(413,'请求过大。');
     chunks.push(chunk);
   }
-  try {
-    const body=JSON.parse(Buffer.concat(chunks).toString('utf8'));
-    if (!body || typeof body!=='object' || Array.isArray(body)) throw new Error();
-    return body;
-  } catch { throw fail(400,'请求格式有误。'); }
+  return Buffer.concat(chunks);
 }
 function visitorFor(req,res,secret) {
   const signature=id=>createHmac('sha256',secret).update(id).digest('hex');
@@ -69,13 +74,23 @@ export function createSiteServer({database=path.join(process.env.DATA_DIR || pat
   const comments=new GitHubComments(discussions.repository,{fetcher:commentsFetch});
   const store=new StatsStore(database,clock);
   const auth=new GitHubAuth(store.db,{fetcher:githubFetch,...authOptions});
-  const community=new GitHubCommunity({repository:discussions.repository,auth,comments,items,discussions:discussions.items,fetcher:githubFetch,clock:auth.clock});
-  const server=http.createServer({requestTimeout:10000,headersTimeout:10000,maxHeaderSize:16384},async(req,res)=>{
+  const uploads=new SubmissionUploads(store.db,{clock:auth.clock});
+  const community=new GitHubCommunity({repository:discussions.repository,auth,comments,items,discussions:discussions.items,data:content.window.CAMPUS_DATA,uploads,fetcher:githubFetch,clock:auth.clock});
+  const server=http.createServer({requestTimeout:60000,headersTimeout:10000,maxHeaderSize:16384},async(req,res)=>{
     res.setHeader('X-Content-Type-Options','nosniff');
     res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');
     try {
       const url=new URL(req.url,'http://local');
       if (url.pathname==='/api/health' && req.method==='GET') return json(res,200,{ok:true});
+      if(url.pathname.startsWith('/media/submissions/')) {
+        if(!['GET','HEAD'].includes(req.method))throw fail(405,'不支持该请求方式。');
+        const name=url.pathname.slice('/media/submissions/'.length);
+        if(!/^[a-f0-9-]{36}\.(png|jpg|gif|webp)$/.test(name))throw fail(404,'图片不存在。');
+        const item=uploads.read(name,auth.session(req));
+        if(!item)throw fail(404,'图片不存在或已过期。');
+        res.writeHead(200,{'Content-Type':item.mime,'Content-Length':item.size,'Cache-Control':item.published?'public, max-age=86400':'private, no-store','Content-Security-Policy':"default-src 'none'; sandbox"});
+        return res.end(req.method==='HEAD'?undefined:Buffer.from(item.bytes));
+      }
       if(url.pathname.startsWith('/auth/')) {
         res.setHeader('Cache-Control','no-store');
         if(req.method!=='GET')throw fail(405,'不支持该请求方式。');
@@ -92,6 +107,15 @@ export function createSiteServer({database=path.join(process.env.DATA_DIR || pat
           return json(res,200,{configured:auth.configured,user:current?.user || null,csrf:current?.csrf || null,canManage:!!current&&canManage});
         }
         if(url.pathname==='/api/logout' && req.method==='POST') {auth.logout(req,res);return json(res,200,{ok:true});}
+        if(url.pathname==='/api/submissions/images') {
+          if(req.method!=='POST')throw fail(405,'不支持该请求方式。');
+          const session=auth.require(req);
+          return json(res,201,uploads.save(session,req.headers['x-upload-id'],await readBytes(req,uploadLimit)));
+        }
+        if(url.pathname==='/api/submissions') {
+          if(req.method!=='POST')throw fail(405,'不支持该请求方式。');
+          return json(res,201,await community.postSubmission(auth.require(req),await readJson(req,96000)));
+        }
         if(url.pathname==='/api/guestbook') {
           if(req.method==='POST')return json(res,201,await community.postGuestbook(auth.require(req),await readJson(req,24000)));
           if(req.method!=='GET')throw fail(405,'不支持该请求方式。');

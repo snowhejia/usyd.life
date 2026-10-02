@@ -107,6 +107,7 @@ test('image downloading checks redirect destinations, size and bytes, and never 
  assert.match(relative,/^assets\/submissions\/[a-f0-9]{64}\.png$/);assert.equal(calls,2);
  assert.deepEqual(fs.readFileSync(path.join(directory,path.basename(relative))),png);
  for(const bad of ['http://github.com/a','https://127.0.0.1/image.png','https://github.com.evil.example/image.png','https://github.com@evil.example/image.png','https://raw.githubusercontent.com/a/b/main/file'])assert.throws(()=>attachmentUrl(bad));
+ for(const bad of ['https://usyd.life/api/session','https://usyd.life/media/submissions/../data.png','https://usyd.life.evil.example/media/submissions/11111111-1111-4111-8111-111111111111.png','https://usyd.life/media/submissions/11111111-1111-4111-8111-111111111111.png?url=http://localhost'])assert.throws(()=>attachmentUrl(bad));
  await assert.rejects(saveImage(url,directory,{fetcher:async()=>new Response(null,{status:302,headers:{location:'http://169.254.169.254/metadata'}})}),/HTTPS/);
  await assert.rejects(saveImage(url,directory,{fetcher:async()=>new Response('<svg onload="alert(1)"></svg>')}),/仅支持/);
  await assert.rejects(saveImage(url,directory,{fetcher:async()=>new Response('x',{headers:{'content-length':String(6*1024*1024)}})}),/5 MB/);
@@ -123,8 +124,8 @@ test('additional images are saved as local files and source audit, without chang
  const record=JSON.parse(fs.readFileSync(path.join(directory,'content/submissions/25.json')));assert.equal(record.images[0],a);
 });
 
-test('publish retries a competing main update and then records success and triggers CI',async t=>{
- const directory=fixture(t),sample=samples[0];let attempts=0,pushes=0,discussions=0;const writes=[];
+test('publish retries a competing main update, backs website images up in GitHub, and records success before triggering CI',async t=>{
+ const directory=fixture(t),sample=issue('[活动投稿] with website photo',{...eventValues,配图:'![](https://usyd.life/media/submissions/11111111-1111-4111-8111-111111111111.png)'});let attempts=0,pushes=0,discussions=0;const writes=[];
  const api=async(route,options={})=>{
   if(route.includes('/permission'))return {permission:'admin'};
   if(route==='/issues/25')return structuredClone(sample);
@@ -139,11 +140,15 @@ test('publish retries a competing main update and then records success and trigg
   if(args[0]==='push'&&++pushes===1)throw new Error('Non fast forward');
   return 'testcommit';
  };
- const result=await publishIssue({directory,event:{issue:sample,repository:{full_name:'snowhejia/usyd.life'}},repository:'snowhejia/usyd.life',actor:'maintainer',token:'test',api,gitRunner,argsRunner:()=>{}});
+ const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+yTioAAAAASUVORK5CYII=','base64');
+ const imageSaver=(url,directory)=>saveImage(url,directory,{fetcher:async()=>new Response(png)});
+ const result=await publishIssue({directory,event:{issue:sample,repository:{full_name:'snowhejia/usyd.life'}},repository:'snowhejia/usyd.life',actor:'maintainer',token:'test',api,gitRunner,argsRunner:()=>{},imageSaver});
  assert.equal(result.id,'issue-25');assert.equal(attempts,2);assert.equal(pushes,2);assert.equal(discussions,2);
  assert.equal(readData(directory).foods[0].id,'other');
  assert.ok(writes.some(item=>item.route==='/actions/workflows/ci.yml/dispatches'));
  assert.ok(writes.some(item=>item.body?.labels?.includes('已收录')));
+ assert.ok(writes.some(item=>item.body?.body?.includes('https://raw.githubusercontent.com/snowhejia/usyd.life/testcommit/dist/'+result.savedImages[0])));
+ assert.deepEqual(fs.readFileSync(path.join(directory,'dist',result.savedImages[0])),png);
 });
 
 test('edits after approval abort before pushing, with an actionable reply',async t=>{

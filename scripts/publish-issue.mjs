@@ -37,7 +37,7 @@ export async function prepareSubmission({directory,repository,issue,reviewer,dat
     parsed.patch.imageFit='contain';parsed.patch.imagePosition='50% 50%';
     parsed.patch.gallery=saved.slice(1).map((image,i)=>({image,imageAlt:parsed.patch.imageAlt+' · 配图 '+(i+2),imageSource:parsed.images[i+1]}));
   }
-  const metadata={issue:issue.number,url:'https://github.com/'+repository+'/issues/'+issue.number,type:parsed.type,id:parsed.id,hash,reviewedBy:reviewer,publishedOn:date,images:parsed.images};
+  const metadata={issue:issue.number,url:'https://github.com/'+repository+'/issues/'+issue.number,type:parsed.type,id:parsed.id,hash,reviewedBy:reviewer,publishedOn:date,images:parsed.images,savedImages:saved};
   const next=applySubmission(data,parsed,{date});
   const output='// Content is maintained through reviewed GitHub submissions and repository changes.\nwindow.CAMPUS_DATA = '+JSON.stringify(next,null,2)+';\n';
   fs.mkdirSync(path.dirname(auditFile),{recursive:true});
@@ -51,7 +51,7 @@ async function report(api,number,hash,message,label) {
   const comments=await allPages(api,'/issues/'+number+'/comments');
   if(!comments.some(comment=>comment.body?.includes(marker)))await api('/issues/'+number+'/comments',{method:'POST',body:{body:marker+'\n\n'+message}});
 }
-export async function publishIssue({directory=root,event,repository,token,actor,dryRun=false,api=githubApi(repository,token),gitRunner,argsRunner}={}) {
+export async function publishIssue({directory=root,event,repository,token,actor,dryRun=false,api=githubApi(repository,token),gitRunner,argsRunner,imageSaver=saveImage}={}) {
   const git=gitRunner || ((...args)=>execFileSync('git',args,{cwd:directory,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim());
   const run=argsRunner || ((...args)=>execFileSync(process.execPath,args,{cwd:directory,stdio:'inherit'}));
   const number=Number(event.issue?.number || event.inputs?.issue_number);
@@ -67,7 +67,7 @@ export async function publishIssue({directory=root,event,repository,token,actor,
     for(let attempt=0;attempt<4;attempt++) {
       const current=await api('/issues/'+number);verifyApproval(snapshot,current,permission);
       if(!dryRun){git('fetch','--no-tags','origin','main');git('reset','--hard','origin/main');}
-      result=await prepareSubmission({directory,repository,issue:snapshot,reviewer:actor});
+      result=await prepareSubmission({directory,repository,issue:snapshot,reviewer:actor,imageSaver});
       if(!result.changed){pushed=true;break;}
       run('scripts/check-content.mjs');
       run('--test','server/*.test.mjs','tests/*.test.mjs');
@@ -82,7 +82,8 @@ export async function publishIssue({directory=root,event,repository,token,actor,
     }
     if(dryRun)return result;
     const commit=git('rev-parse','HEAD');
-    await report(api,number,hash,'已收录。\n\n- [查看收录记录](https://github.com/'+repository+'/blob/main/content/submissions/'+number+'.json)\n- [查看代码更新](https://github.com/'+repository+'/commit/'+commit+')\n- 详情路径：`detail.html?type='+result.type+'&id='+result.id+'`\n\n连接 Railway 自动部署后，本次更新会随部署发布。后续修改请重新审核；重复运行不会重复添加条目。','已收录');
+    const backups=(result.savedImages || []).map((image,i)=>'![投稿配图 '+(i+1)+'](https://raw.githubusercontent.com/'+repository+'/'+commit+'/dist/'+image+')').join('\n\n');
+    await report(api,number,hash,'已收录。\n\n- [查看收录记录](https://github.com/'+repository+'/blob/main/content/submissions/'+number+'.json)\n- [查看代码更新](https://github.com/'+repository+'/commit/'+commit+')\n- 详情路径：`detail.html?type='+result.type+'&id='+result.id+'`\n\n部署完成后会显示在网站。'+(backups?'\n\n### 配图备份\n\n'+backups:''),'已收录');
     // GITHUB_TOKEN pushes do not start other push workflows, so request checks explicitly.
     await api('/actions/workflows/ci.yml/dispatches',{method:'POST',body:{ref:'main'}});
     return result;
