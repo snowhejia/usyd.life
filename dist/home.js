@@ -59,7 +59,7 @@ import {selectHomeResources} from './home-selection.js?v=1';
       return label(item.startDate) + (end === item.startDate ? '' : ' – ' + label(end));
     }
     function artwork(item) {
-      if (item.image) return '<img src="' + escape(item.image) + '" alt="' + escape(item.imageAlt || item.title) + '" decoding="async" style="object-position:' + escape(item.imagePosition || '50% 42%') + ';object-fit:' + escape(item.imageFit || 'cover') + '">';
+      if (item.image) return '<img src="' + escape(item.image) + '" alt="' + escape(item.imageAlt || item.title) + '" decoding="async" style="object-position:' + escape(item.imagePosition || '50% 42%') + '">';
       if (item.artwork === 'icecream') {
         return '<div class="featured-art" aria-hidden="true"><span class="featured-art-title">FREE<br>GELATO</span><svg class="featured-cone" viewBox="0 0 44 60"><path d="M9 28h26v7h-3v6h-3v6h-3v6h-3v5h-4v-5h-3v-6h-3v-6h-3v-6H9Z" fill="#dfad6c" stroke="#4c302b" stroke-width="2"/><path d="M12 34h20M15 41h14M18 48h8M15 31v7m6 3v7m6-17v7" fill="none" stroke="#bc864f" stroke-width="2"/><path d="M15 3h14v4h6v6h4v13h-4v5h-8v-3H17v3H9v-5H5V13h4V7h6Z" fill="#f1aaab" stroke="#4c302b" stroke-width="2"/><path d="M13 10h6v3h-6Zm14 8h4v3h-4ZM9 21h4v3H9Z" fill="#fff1dc"/></svg><span class="featured-art-stamp">FREE ICE CREAM</span></div>';
       }
