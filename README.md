@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://usyd.life/"><strong>打开网站 ↗</strong></a> ·
-  <a href="https://usyd.life/submit.html">分享一条信息</a> ·
+  <a href="https://usyd.life/submit.html">投稿</a> ·
   <a href="https://usyd.life/guestbook.html">留言板</a>
 </p>
 
