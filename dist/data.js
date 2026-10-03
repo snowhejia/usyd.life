@@ -343,6 +343,26 @@ window.CAMPUS_DATA = {
       "imagePosition": "50% 50%",
       "imageSource": "https://www.ubereats.com/au/store/kura-ichi-haymarket/dRUqeA6WQjuFgKPunqqf9g",
       "imageCredit": "Kura Ichi / Uber Eats 店铺菜单"
+    },
+    {
+      "source": "https://github.com/snowhejia/usyd.life/issues/21",
+      "title": "开小灶",
+      "description": "小灶一碗香很好吃！",
+      "dishes": "小灶一碗香",
+      "price": "25",
+      "budget": "25",
+      "address": "173-179 Broadway, Shop 2, Ultimo, NSW 2007",
+      "location": "173-179 Broadway, Shop 2, Ultimo, NSW 2007",
+      "image": "assets/submissions/93db28781b89eea7975786e314c8b6ce146d11352d3f0f327c75f5edbddfcb8a.jpg",
+      "imageAlt": "开小灶",
+      "imageSource": "https://usyd.life/media/submissions/8eef04d0-8eba-465a-8215-54456d69ea29.jpg",
+      "imageCredit": "GitHub 投稿 @snowhejia",
+      "imageFit": "contain",
+      "imagePosition": "50% 50%",
+      "gallery": [],
+      "screenshot": "assets/submissions/93db28781b89eea7975786e314c8b6ce146d11352d3f0f327c75f5edbddfcb8a.jpg",
+      "sourceLabel": "查看投稿来源",
+      "id": "issue-21"
     }
   ],
   "notices": [

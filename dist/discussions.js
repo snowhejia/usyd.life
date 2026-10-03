@@ -15,6 +15,7 @@ window.CAMPUS_DISCUSSIONS = {
     "food:courtyard": 11,
     "food:nene-chicken": 12,
     "food:happy-ramen": 13,
-    "food:kura-ichi": 14
+    "food:kura-ichi": 14,
+    "food:issue-21": 22
   }
 };
