@@ -35,7 +35,7 @@
     facts = [['餐食',item.dishes],['价格',item.budget || item.price],['位置',item.location],['地址',item.address],['营业时间',item.hours]];
     actions = external(item.menuUrl,'查看菜单','button') + (item.address ? external('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((item.name || title) + ' ' + item.address),'地图导航','button secondary') : '');
   }
-  const media = item.image ? '<img class="detail-cover" src="' + escape(item.image) + '" alt="' + escape(item.imageAlt || title) + '" style="object-position:' + escape(item.imagePosition || '50% 42%') + ';object-fit:' + escape(item.imageFit || 'cover') + '">' : '';
+  const media = item.image ? '<img class="detail-cover" src="' + escape(item.image) + '" alt="' + escape(item.imageAlt || title) + '" style="object-position:' + escape(item.imagePosition || '50% 42%') + '">' : '';
   const gallery = (item.gallery || []).length ? '<section class="detail-gallery" aria-label="更多配图">' + item.gallery.map(photo=>'<a href="'+escape(photo.image)+'" target="_blank" rel="noopener noreferrer"><img src="'+escape(photo.image)+'" alt="'+escape(photo.imageAlt || title)+'" loading="lazy"></a>').join('') + '</section>' : '';
   const notification = item.screenshot ? '<details class="source-notification"><summary>查看原始通知</summary><img src="' + escape(item.screenshot) + '" alt="' + escape(title) + ' 原始通知" loading="lazy"></details>' : '';
   const sourceUrl = item.collectionSource || item.source;
