@@ -13,7 +13,7 @@
     const href = detailUrl(type,item.id);
     const title = escape(item.title || item.name);
     const artwork = item.image
-      ? '<img src="' + escape(item.image) + '" alt="' + escape(item.imageAlt || item.title) + '" loading="lazy" style="object-position:' + escape(item.imagePosition || '50% 50%') + ';object-fit:' + escape(item.imageFit || 'cover') + '">'
+      ? '<img src="' + escape(item.image) + '" alt="' + escape(item.imageAlt || item.title) + '" loading="lazy" style="object-position:' + escape(item.imagePosition || '50% 50%') + '">'
       : (type === 'notice' ? '<time class="notice-card-date" datetime="' + escape(item.effectiveDate || '') + '">' + escape(item.effectiveDate ? dateLabel(item.effectiveDate) : '日常提醒') + '</time>' : '') + icon(item.icon || (type === 'benefit' ? 'heart' : type === 'food' ? 'bowl' : 'note'));
     const photoDate = type === 'notice' && item.image && item.effectiveDate ? '<time class="notice-card-date" datetime="' + escape(item.effectiveDate) + '">' + escape(dateLabel(item.effectiveDate)) + '</time>' : '';
     let content = '';

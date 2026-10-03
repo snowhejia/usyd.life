@@ -11,7 +11,6 @@ import {selectHomeResources} from './home-selection.js?v=1';
     if (item?.image) {
       element.href = 'detail.html?type=' + type + '&id=' + encodeURIComponent(item.id);
       element.setAttribute('aria-label','查看 ' + item.title + ' 的详情');
-      element.querySelector('img').style.objectFit = item.imageFit || 'cover';
     }
     if (item?.imagePosition) element.querySelector('img')?.style.setProperty('object-position',item.imagePosition);
   }

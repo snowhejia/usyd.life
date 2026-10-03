@@ -34,7 +34,7 @@ export async function prepareSubmission({directory,repository,issue,reviewer,dat
   if(saved.length) {
     parsed.patch.image=saved[0];parsed.patch.imageAlt=parsed.patch.title || data[collections[parsed.type]].find(item=>item.id===parsed.id)?.title;
     parsed.patch.imageSource=parsed.images[0];parsed.patch.imageCredit='GitHub 投稿 @'+issue.user.login;
-    parsed.patch.imageFit='contain';parsed.patch.imagePosition='50% 50%';
+    parsed.patch.imageFit='cover';parsed.patch.imagePosition='50% 50%';
     parsed.patch.gallery=saved.slice(1).map((image,i)=>({image,imageAlt:parsed.patch.imageAlt+' · 配图 '+(i+2),imageSource:parsed.images[i+1]}));
   }
   if(parsed.sourceImage) {
