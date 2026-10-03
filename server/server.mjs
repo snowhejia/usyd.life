@@ -176,9 +176,13 @@ export function createSiteServer({database=path.join(process.env.DATA_DIR || pat
       if (!info.isFile() || !actual.startsWith(path.resolve(staticDir)+path.sep) || !mime[path.extname(filename)]) throw fail(404,'页面不存在。');
       const missing=relative==='/detail.html' && url.searchParams.has('id') && !contentIds.has((url.searchParams.get('type') || 'event')+':'+url.searchParams.get('id'));
       const etag=`W/"${info.size}-${Math.trunc(info.mtimeMs)}${missing?'-missing':''}"`;
+      // Published content and its discussion mapping must advance together after a deploy.
+      // A CDN browser TTL can turn no-cache into a multi-hour cache, so do not store these.
+      const liveContent=path.extname(filename)==='.html' || ['data.js','discussions.js'].includes(path.basename(filename));
       res.setHeader('ETag',etag);
-      res.setHeader('Cache-Control','no-cache');
-      if (req.headers['if-none-match']===etag) { res.writeHead(304); return res.end(); }
+      res.setHeader('Cache-Control',liveContent?'no-store':'no-cache');
+      if(liveContent)res.setHeader('CDN-Cache-Control','no-store');
+      if (!liveContent && req.headers['if-none-match']===etag) { res.writeHead(304); return res.end(); }
       res.writeHead(missing?404:200,{'Content-Type':mime[path.extname(filename)],'Content-Length':info.size});
       if (req.method==='HEAD') return res.end();
       const stream=createReadStream(filename);
