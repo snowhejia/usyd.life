@@ -4,6 +4,12 @@
   if(!container)return;
   const repository=window.CAMPUS_CONFIG?.repositoryUrl || 'https://github.com/snowhejia/usyd.life';
   window.Community.feed(container,{endpoint:'/api/guestbook',guestbook:true,githubUrl:repository.replace(/\/$/,'')+'/issues?q=is%3Aissue+in%3Atitle+%22%5B留言%5D%22'});
+  const compose=document.createElement('section');
+  compose.className='guestbook-window guestbook-compose';
+  compose.setAttribute('aria-labelledby','guestbook-compose-title');
+  compose.innerHTML='<div class="window-bar yellow"><h2 id="guestbook-compose-title">WRITE <span class="guestbook-translation">发留言</span></h2><span aria-hidden="true">▪ ▪ ▪</span></div>';
+  compose.append(container.querySelector('[data-editor]'));
+  container.prepend(compose);
   const messages=document.createElement('section');
   messages.className='guestbook-messages';
   messages.setAttribute('aria-labelledby','guestbook-messages-title');
