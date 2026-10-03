@@ -12,7 +12,7 @@
 ## 用户提供的资料
 
 - `gelato-source.jpg`、`community-source.jpg`、`canva-source.jpg`：用户 [Craft 收藏](https://books-cough-6mk.craft.me/0j05SQY1ZMu8ai) 中的学校通知截图。
-- `gelato-update.jpg`：用户在本次对话补充的最新通知，确认 10 月 6 日上午 11 点、送完为止。
+- `gelato-update.jpg`：最初整理资料时补充的学校通知，确认 2026 年 10 月 6 日上午 11 点、送完为止。
 - `community-card.jpg`：早期从用户提供的 Community Festival 通知截图裁切出的活动照片，现已由官方高清原图替换，保留作原素材记录。
 
 上述截图与照片的版权属于原权利人，没有被网站代码的 MIT 许可重新授权。
@@ -28,7 +28,7 @@
 
 - `manning-banner.png`：来自 [USU Manning Night Market 官方页面](https://usu.edu.au/manning-night-market/)。
 - [原图](https://images.ctfassets.net/n92mdxt3dwn7/r9DsFMQki2oGQMzfA9ECx/2b0fa0e6595d19056b74eb1d95bd63a4/WebsiteBanner.png?w=2000&h=600&fit=fill)
-- 版权属于 USU／原作者，未确认有开放许可。用于本地 demo 对相应活动的介绍，代码许可不覆盖该素材。
+- 版权属于 USU／原作者，未确认有开放许可。用于网站对应活动的介绍，代码许可不覆盖该素材。
 
 Free Gelato 卡片采用原创文字排版；首页轮播配有项目内绘制的简单 SVG 像素冰淇淋插图，没有把其他商家的冰淇淋照片当作该活动照片。首页学生权益、生活提醒、美食推荐使用下列真实配图，独立显示在标题上方，不叠加透明度或渐变。
 
@@ -36,7 +36,7 @@ Free Gelato 卡片采用原创文字排版；首页轮播配有项目内绘制�
 
 - 文件：`dist/assets/after-class-lion.png`。
 - 按用户提供的蜡笔小狮子参考图，用 imagegen 生成的透明背景吉祥物。采用蓬松的橙色鬃毛、黄色脸部与小身体、炭灰色五官，保留大小不一的轮廓、蜡笔颗粒和没涂满的空隙。
-- 参考图由用户在本次对话提供；此吉祥物用于学生项目的本地 demo，不是学校官方校徽。
+- 参考图由项目发起者提供；此吉祥物保留为早期设计素材，不是学校官方校徽。当前网站使用下方记录的简化狮子头像。
 
 ## 早期像素小狮子
 
@@ -53,10 +53,9 @@ Free Gelato 卡片采用原创文字排版；首页轮播配有项目内绘制�
 
 ## 页面配色与风格
 
-- 参考 [Sydney Informatics Hub 的 usydColours 色表](https://github.com/Sydney-Informatics-Hub/usydColours#rgb-values-and-hex-codes-of-colours) 中的 MasterbrandOchre `#E64626`、MasterbrandCharcoal `#424242` 和 Sandstone `#FBEEE2`。
-- 网站使用自己的浅色背景搭配，主按钮的赭橙加深为 `#CF3C20`，以保证白色小字的可读性。
-
-- 最新桌面风格根据用户提供的复古像素界面参考重新排版；浅蓝网格、奶油色面板和青绿色标题栏由 CSS 实现，像素图标为项目内的简单 SVG 图形。参考图片本身未作为网页素材嵌入。当前统一视觉样式位于 site.css，页面布局分别维护。
+- 早期配色参考 [Sydney Informatics Hub 的 usydColours 色表](https://github.com/Sydney-Informatics-Hub/usydColours#rgb-values-and-hex-codes-of-colours)，保留作设计来源记录。
+- 当前网站采用复古像素界面：浅蓝网格背景 `#D4E1F6`、偏白面板 `#FFFDF8`、深棕文字与边框 `#4C302B`，搭配青绿 `#83B8AA`、浅黄 `#F3D27F` 和蜜桃色 `#ECAD86`。统一视觉样式位于 `dist/site.css`，页面布局分别维护。
+- 复古像素参考图由项目发起者提供，图片本身未作为网页素材嵌入；网格、边框与窗口标题栏由 CSS 实现，像素图标为项目内的简单 SVG 图形。
 
 ## 当前简化狮子头像
 
@@ -104,4 +103,6 @@ Free Gelato 卡片采用原创文字排版；首页轮播配有项目内绘制�
 
 ## 社区投稿图片
 
-自动收录的图片保存在 `dist/assets/submissions/`。原始 GitHub 图片链接、投稿 Issue 和审核记录保存在 `content/submissions/`；图片来源也随内容保留。此目录的图片不自动适用代码的 MIT 许可，投稿者需确认图片可以公开展示。
+审核通过后自动收录的图片保存在 `dist/assets/submissions/`。原始网站上传链接或 GitHub 附件链接、投稿 Issue 和审核记录保存在 `content/submissions/`；图片来源也随内容保留。原 Issue 的收录回执提供固定提交版本的图片备份链接。
+
+网站上传的草稿图片仅上传者可见，确认投稿后即公开，早于审核收录。关闭投稿或下架条目不会自动清除图片及其已有备份；具体处理范围见 [维护指南](CONTRIBUTING.md)。此目录的图片不自动适用代码的 MIT 许可，投稿者需确认图片可以公开展示，维护者需核对来源与隐私信息。
