@@ -6,7 +6,9 @@
   const contentId=section.dataset.contentId;
   const likeButton=document.getElementById('content-like');
   const likeStatus=document.getElementById('content-like-status');
+  const likeFeedback=likeStatus.parentElement;
   const likeRetry=document.getElementById('content-like-retry');
+  likeFeedback.hidden=true;
   const number=new Intl.NumberFormat('zh-CN');
   let liked=false;
   let known=false;
@@ -43,12 +45,14 @@
     document.getElementById('content-like-count').textContent=number.format(data.likes);
     likeStatus.textContent='';
     likeRetry.hidden=true;
+    likeFeedback.hidden=true;
   }
   function showLikeError() {
     known=false;
     likeButton.disabled=true;
     likeStatus.textContent='点赞暂不可用，请重试。';
     likeRetry.hidden=false;
+    likeFeedback.hidden=false;
   }
   async function refreshLikes() {
     if (busy) return;
@@ -66,7 +70,6 @@
     try {
       const data=await requestLike(!liked);
       renderLikes(data);
-      likeStatus.textContent=data.liked?'已点赞':'已取消点赞';
       likeAnimation?.cancel();
       const heart=likeButton.querySelector('svg');
       if (data.liked && !motionPreference.matches && typeof heart.animate==='function') {

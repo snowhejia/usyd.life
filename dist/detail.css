@@ -21,6 +21,7 @@
 .content-like:disabled{cursor:default;opacity:.65}
 #content-like-count{font-family:var(--retro-mono);min-width:1ch}
 .content-like-feedback{display:flex;justify-content:flex-end;align-items:center;gap:10px;min-height:22px;margin-top:6px;font-size:11px;color:var(--muted)}
+.content-like-feedback[hidden]{display:none}
 .content-like-feedback .text-link{font-size:11px}
 .content-comments{margin-top:12px;border-top:1px dashed var(--line);padding-top:24px;min-width:0}
 .content-comments-status{padding:24px 0;font-size:13px;line-height:1.8;color:var(--muted);text-align:center}
