@@ -175,6 +175,31 @@ window.CAMPUS_DATA = {
       "source": "https://community-festival.sydney.edu.au/2026/10819038?ref=edm-a-o-n3-wods",
       "sourceLabel": "活动官方网站",
       "search": "社区 校园 节日 社交 聚会 community festival camperdown 免费"
+    },
+    {
+      "source": "https://github.com/snowhejia/usyd.life/issues/18",
+      "title": "测试",
+      "description": "测试",
+      "tags": [
+        "club"
+      ],
+      "entryFree": false,
+      "organiser": "测试",
+      "startDate": "2026-10-03",
+      "endDate": "2026-10-03",
+      "time": "测试",
+      "location": "测试",
+      "price": "免费活动",
+      "image": "assets/submissions/e92829218df84559f1c613378099bca6d66050ea15092ca87e10c097ca2fd15c.jpg",
+      "imageAlt": "测试",
+      "imageSource": "https://usyd.life/media/submissions/f49c274c-d9f8-407a-8772-68dcbbf671b3.jpg",
+      "imageCredit": "GitHub 投稿 @snowhejia",
+      "imageFit": "contain",
+      "imagePosition": "50% 50%",
+      "gallery": [],
+      "screenshot": "assets/submissions/e92829218df84559f1c613378099bca6d66050ea15092ca87e10c097ca2fd15c.jpg",
+      "sourceLabel": "查看投稿来源",
+      "id": "issue-18"
     }
   ],
   "benefits": [

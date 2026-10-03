@@ -7,6 +7,7 @@ window.CAMPUS_DISCUSSIONS = {
     "event:boardgames-origami-2026-10-15": 3,
     "event:sculpture-by-the-sea-bondi-2026": 4,
     "event:festival": 5,
+    "event:issue-18": 19,
     "benefit:canva": 6,
     "benefit:foodhub": 7,
     "benefit:university-canteen": 8,
