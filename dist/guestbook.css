@@ -1,13 +1,34 @@
 .guestbook-main{padding-top:25px}
 .guestbook-window{border:2px solid var(--ink);border-radius:3px;background:var(--paper);box-shadow:4px 4px 0 var(--ink);overflow:hidden}
 .guestbook-translation{font:12px/1.4 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;border-left:1px solid #4c302b66;padding-left:9px}
-.guestbook-content{display:flex;flex-direction:column;align-items:flex-start;gap:22px;padding:38px}
-.guestbook-icon{width:48px;height:48px;shape-rendering:crispEdges}
+.guestbook-content{display:grid;gap:28px;padding:32px}
+.guestbook-heading{display:flex;align-items:center;gap:16px}
+.guestbook-icon{width:48px;height:48px;flex-shrink:0;shape-rendering:crispEdges}
 .guestbook-content h1{font-size:30px;line-height:1.4}
-.guestbook-intro{font-size:15px;line-height:1.8;color:var(--muted);margin-top:8px}
-.guestbook-actions{display:flex;flex-wrap:wrap;gap:14px}
-.guestbook-status{font-size:13px;line-height:1.8;color:var(--muted)}
-.guestbook-back{font-size:12px}
-@media(max-width:760px){.guestbook-main{padding-top:18px}.guestbook-content{padding:25px;gap:21px}.guestbook-content h1{font-size:27px}.guestbook-intro{font-size:14px}.guestbook-actions{width:100%}.guestbook-actions .button{flex:1 1 170px}}
+.guestbook-intro{font-size:15px;line-height:1.8;color:var(--muted);margin-top:4px}
+.guestbook-back{justify-self:start;font-size:12px}
 
-#guestbook-feed{grid-column:1/-1;width:100%;min-width:0}.guestbook-content{align-items:start}
+#guestbook-feed{display:grid;grid-template-columns:minmax(300px,.8fr) minmax(0,1.2fr);align-items:start;gap:32px;min-width:0}
+#guestbook-feed .community-editor{min-width:0;margin:0;padding:24px}
+#guestbook-feed .community-editor textarea{min-height:180px}
+.guestbook-messages{min-width:0;padding-left:32px;border-left:1px dashed var(--line)}
+.guestbook-messages h2{font-size:18px;line-height:1.5;margin-bottom:18px}
+.guestbook-messages .community-empty{padding:18px 0}
+.guestbook-messages .community-empty:empty{display:none}
+.guestbook-messages .community-controls{justify-content:flex-start;margin-top:24px}
+
+@media(max-width:900px){
+  .guestbook-content{padding:25px;gap:24px}
+  #guestbook-feed{grid-template-columns:1fr;gap:28px}
+  .guestbook-messages{padding:24px 0 0;border-left:0;border-top:1px dashed var(--line)}
+}
+@media(max-width:760px){
+  .guestbook-main{padding-top:18px}
+  .guestbook-content{padding:20px;gap:22px}
+  .guestbook-heading{gap:12px}
+  .guestbook-icon{width:40px;height:40px}
+  .guestbook-content h1{font-size:27px}
+  .guestbook-intro{font-size:14px}
+  #guestbook-feed .community-editor{padding:18px}
+  #guestbook-feed .community-editor textarea{min-height:150px}
+}
