@@ -38,6 +38,44 @@ test('four content types accept website and GitHub template field labels',()=>{
  assert.equal(parseSubmission(samples[2],data()).patch.expiresOn,undefined);
 });
 
+test('every submission type accepts a notification screenshot instead of a source URL, but never neither',()=>{
+ const screenshot='https://github.com/user-attachments/assets/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+ const sourceFields=['来源','可核对的来源','店铺、菜单或地图链接'];
+ for(const sample of samples) {
+  const values=Object.fromEntries([...sectionsOf(sample.body)].filter(([key])=>!sourceFields.includes(key)));
+  const parsed=parseSubmission(issue(sample.title,{...values,配图:'![通知截图]('+screenshot+')'}),data());
+  assert.equal(parsed.sourceImage,screenshot);assert.equal(parsed.patch.source,screenshot);
+  assert.deepEqual(parsed.images,[screenshot]);
+  assert.throws(()=>parseSubmission(issue(sample.title,values),data()),/来源链接.*通知截图/);
+ }
+ assert.throws(()=>parseSubmission(issue(samples[0].title,{...eventValues,来源:'不是链接',配图:'![]('+screenshot+')'}),data()),/来源链接/);
+ assert.throws(()=>parseSubmission(issue(samples[0].title,{...eventValues,来源:'',配图:'![](https://evil.example/mail.png)'}),data()),/上传的图片/);
+});
+
+test('source screenshots are kept alongside a separate cover and count toward the shared image limit',()=>{
+ const cover='https://github.com/user-attachments/assets/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+ const screenshot='https://user-images.githubusercontent.com/123/notification.png';
+ const parsed=parseSubmission(issue(samples[0].title,{...eventValues,来源:'![邮件截图]('+screenshot+')',配图:'![]('+cover+')'}),data());
+ assert.equal(parsed.sourceImage,screenshot);assert.deepEqual(parsed.images,[cover,screenshot]);
+ const bare=parseSubmission(issue(samples[0].title,{...eventValues,来源:screenshot}),data());
+ assert.deepEqual(bare.images,[screenshot]);assert.equal(bare.sourceImage,screenshot);
+ const three=[cover,'https://user-images.githubusercontent.com/123/two.png','https://user-images.githubusercontent.com/123/three.png'];
+ assert.throws(()=>parseSubmission(issue(samples[0].title,{...eventValues,来源:'![]('+screenshot+')',配图:three.join('\n')}),data()),/最多/);
+});
+
+test('reviewed screenshot evidence is backed up and exposed as the original notification in details',async t=>{
+ const directory=fixture(t),screenshot='https://github.com/user-attachments/assets/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+ const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+yTioAAAAASUVORK5CYII=','base64');
+ const sample=issue('[活动投稿] 只有邮件截图',{...eventValues,来源:'_No response_',配图:'![原始通知]('+screenshot+')'});
+ const imageSaver=(url,folder)=>saveImage(url,folder,{fetcher:async()=>new Response(png)});
+ const result=await prepareSubmission({directory,repository:'snowhejia/usyd.life',issue:sample,reviewer:'maintainer',imageSaver});
+ const item=readData(directory).events[0];
+ assert.equal(item.source,'https://github.com/snowhejia/usyd.life/issues/25');
+ assert.equal(item.sourceLabel,'查看投稿来源');assert.equal(item.screenshot,result.savedImages[0]);
+ assert.deepEqual(fs.readFileSync(path.join(directory,'dist',item.screenshot)),png);
+ assert.equal(JSON.parse(fs.readFileSync(path.join(directory,'content/submissions/25.json'))).sourceImage,screenshot);
+});
+
 test('bad dates, links, categories, missing consent and duplicate headings never produce content',()=>{
  for(const change of [{日期:'2026-02-30'},{日期:'2026-10-12 至 2026-10-10'},{活动标签:'#不存在'},{活动标签:'constructor'},{来源:'javascript:alert(1)'},{来源:'https://user:password@example.org/'},{主办方:''}]) {
   assert.throws(()=>parseSubmission(issue('[活动投稿] test',{...eventValues,...change}),data()));
@@ -124,8 +162,8 @@ test('additional images are saved as local files and source audit, without chang
  const record=JSON.parse(fs.readFileSync(path.join(directory,'content/submissions/25.json')));assert.equal(record.images[0],a);
 });
 
-test('publish retries a competing main update, backs website images up in GitHub, and records success before triggering CI',async t=>{
- const directory=fixture(t),sample=issue('[活动投稿] with website photo',{...eventValues,配图:'![](https://usyd.life/media/submissions/11111111-1111-4111-8111-111111111111.png)'});let attempts=0,pushes=0,discussions=0;const writes=[];
+test('publish retries a competing main update, backs website screenshot sources up in GitHub, and records success before triggering CI',async t=>{
+ const directory=fixture(t),sample=issue('[活动投稿] with website photo',{...eventValues,来源:'',配图:'![](https://usyd.life/media/submissions/11111111-1111-4111-8111-111111111111.png)'});let attempts=0,pushes=0,discussions=0;const writes=[];
  const api=async(route,options={})=>{
   if(route.includes('/permission'))return {permission:'admin'};
   if(route==='/issues/25')return structuredClone(sample);
@@ -149,6 +187,8 @@ test('publish retries a competing main update, backs website images up in GitHub
  assert.ok(writes.some(item=>item.body?.labels?.includes('已收录')));
  assert.ok(writes.some(item=>item.body?.body?.includes('https://raw.githubusercontent.com/snowhejia/usyd.life/testcommit/dist/'+result.savedImages[0])));
  assert.deepEqual(fs.readFileSync(path.join(directory,'dist',result.savedImages[0])),png);
+ assert.equal(readData(directory).events[0].source,'https://github.com/snowhejia/usyd.life/issues/25');
+ assert.equal(readData(directory).events[0].screenshot,result.savedImages[0]);
 });
 
 test('edits after approval abort before pushing, with an actionable reply',async t=>{

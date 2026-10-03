@@ -151,7 +151,7 @@ test('revoking the GitHub token invalidates the server session and prevents furt
   assert.equal((await f.write('/api/guestbook',{title:'test',text:'test',requestId:randomUUID()},s)).status,401);
 });
 
-const submission=(prefix,values)=>({title:'['+prefix+'] 测试投稿',body:Object.entries({标题:'测试投稿',介绍:'同学一起维护的信息。',...values,来源:'https://example.org/source'}).map(([key,value])=>'### '+key+'\n'+value).join('\n\n')+'\n\n---\n- [x] 信息及配图可公开展示，已附可核对的来源。',requestId:randomUUID()});
+const submission=(prefix,values)=>({title:'['+prefix+'] 测试投稿',body:Object.entries({标题:'测试投稿',介绍:'同学一起维护的信息。',来源:'https://example.org/source',...values}).map(([key,value])=>'### '+key+'\n'+value).join('\n\n')+'\n\n---\n- [x] 信息及配图可公开展示，已附可核对的来源。',requestId:randomUUID()});
 const eventFields={活动标签:'#社团、#免费',主办方:'Test Club',日期:'2026-10-15',悉尼当地时间:'10:30–15:30',地点:'J12',费用:'免费'};
 const foodFields={'推荐菜 / 餐食':'乌冬面','人均预算 / 价格':'A$12','地址 / 校内位置':'Camperdown'};
 test('all four structured submissions stay on site and become unapproved Issues attributed to the signed-in user',async t=>{
@@ -181,6 +181,7 @@ test('submission writes reject missing auth, CSRF, invalid content and stale cor
     {...body,title:'[留言] test'},
     {...body,body:body.body.replace('[x]','[ ]')},
     {...body,body:body.body.replace('2026-10-15','2026-02-30')},
+    {...body,body:body.body.replace('https://example.org/source','')},
     {...body,body:body.body+'\n### 标题\n重复栏目'},
     {...body,body:'x'.repeat(25001)}
   ])assert.equal((await f.write('/api/submissions',{...bad,requestId:randomUUID()},s)).status,400);
@@ -208,8 +209,9 @@ test('website images persist, stay private until submission, enforce ownership a
   assert.equal((await f.get(image.previewUrl,other.cookie)).status,404);
   assert.deepEqual(Buffer.from(await (await f.get(image.previewUrl,s.cookie)).arrayBuffer()),png);
   await f.restart();assert.equal((await f.get(image.previewUrl,s.cookie)).status,200);
-  const body=submission('美食投稿',{...foodFields,配图:'![封面]('+image.url+')'});
+  const body=submission('美食投稿',{...foodFields,来源:'',配图:'![通知截图]('+image.url+')'});
   assert.equal((await f.write('/api/submissions',body,other)).status,403);
+  assert.equal((await f.write('/api/submissions',submission('美食投稿',{...foodFields,来源:image.url}),other)).status,403);
   assert.equal((await f.get(image.previewUrl)).status,404);
   assert.equal((await f.write('/api/submissions',body,s)).status,201);
   const publicImage=await f.get(image.previewUrl);assert.equal(publicImage.status,200);assert.equal(publicImage.headers.get('content-type'),'image/png');

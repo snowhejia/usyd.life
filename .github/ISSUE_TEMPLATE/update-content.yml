@@ -66,9 +66,9 @@ body:
     id: source
     attributes:
       label: 可核对的来源
-      description: 请附官方来源链接或 GitHub 上传的通知图片链接。
+      description: 填写来源链接，或在此处上传邮件、通知截图，至少提供一种。更新配图时，也可将来源截图放在「更新后的内容」中。请先遮去私人信息。
     validations:
-      required: true
+      required: false
   - type: checkboxes
     id: confirmation
     attributes:

@@ -37,7 +37,13 @@ export async function prepareSubmission({directory,repository,issue,reviewer,dat
     parsed.patch.imageFit='contain';parsed.patch.imagePosition='50% 50%';
     parsed.patch.gallery=saved.slice(1).map((image,i)=>({image,imageAlt:parsed.patch.imageAlt+' · 配图 '+(i+2),imageSource:parsed.images[i+1]}));
   }
-  const metadata={issue:issue.number,url:'https://github.com/'+repository+'/issues/'+issue.number,type:parsed.type,id:parsed.id,hash,reviewedBy:reviewer,publishedOn:date,images:parsed.images,savedImages:saved};
+  if(parsed.sourceImage) {
+    parsed.patch.screenshot=saved[parsed.images.indexOf(parsed.sourceImage)];
+    parsed.patch.source='https://github.com/'+repository+'/issues/'+issue.number;
+    parsed.patch.sourceLabel='查看投稿来源';
+    parsed.patch.collectionSource=undefined;
+  }
+  const metadata={issue:issue.number,url:'https://github.com/'+repository+'/issues/'+issue.number,type:parsed.type,id:parsed.id,hash,reviewedBy:reviewer,publishedOn:date,images:parsed.images,savedImages:saved,sourceImage:parsed.sourceImage};
   const next=applySubmission(data,parsed,{date});
   const output='// Content is maintained through reviewed GitHub submissions and repository changes.\nwindow.CAMPUS_DATA = '+JSON.stringify(next,null,2)+';\n';
   fs.mkdirSync(path.dirname(auditFile),{recursive:true});

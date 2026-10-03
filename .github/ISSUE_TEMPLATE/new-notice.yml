@@ -39,9 +39,9 @@ body:
     id: source
     attributes:
       label: 可核对的来源
-      description: 官方页面、公开通知或遮去私人信息的通知截图。
+      description: 填写来源链接，或在此处 /「配图」中上传邮件、通知截图，至少提供一种。无链接时请将通知截图放在第一张，并先遮去私人信息。
     validations:
-      required: true
+      required: false
   - type: input
     id: expires-on
     attributes:

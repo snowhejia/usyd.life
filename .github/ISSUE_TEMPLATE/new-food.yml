@@ -52,8 +52,9 @@ body:
     id: source
     attributes:
       label: 店铺、菜单或地图链接
+      description: 填写链接，或在此处 /「配图」中上传可核对信息的菜单、通知截图，至少提供一种。无链接时请将来源截图放在第一张，并先遮去私人信息。
     validations:
-      required: true
+      required: false
   - type: input
     id: expires-on
     attributes:

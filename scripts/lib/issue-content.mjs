@@ -1,4 +1,5 @@
 import {createHash} from 'node:crypto';
+import {attachmentUrl} from './issue-images.mjs';
 
 export const approvalLabel='审核通过';
 export const collections={event:'events',benefit:'benefits',notice:'notices',food:'foods'};
@@ -58,7 +59,7 @@ export function imageLinks(value='',allowBare=true) {
 }
 function sourceLink(value) {
   const candidate=value?.match(/https?:\/\/[^\s<>"')\]]+/)?.[0];
-  return safeLink(candidate,'来源') || (()=>{throw new Error('请补充可核对的来源链接，也可以使用公开的 GitHub 通知图片链接。');})();
+  return safeLink(candidate,'来源') || (()=>{throw new Error('请提供来源链接，或上传邮件 / 通知截图。');})();
 }
 
 export function parseSubmission(issue,data) {
@@ -76,10 +77,12 @@ export function parseSubmission(issue,data) {
   if(updating&&!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(entryId))throw new Error('更新时请填写详情链接中的条目 ID。');
   const existing=updating?data[collections[type]].find(item=>item.id===entryId):undefined;
   if(updating&&!existing)throw new Error('没有找到需要更新的条目，请核对内容类型和 ID。');
-  const source=sourceLink(required('来源','可核对的来源','店铺、菜单或地图链接'));
-  const patch={source};
   let images=imageLinks(get('配图') || '');
   if(!images.length)images=imageLinks(issue.body,false);
+  const sourceAnswer=get('来源','可核对的来源','店铺、菜单或地图链接');
+  const source=sourceAnswer?sourceLink(sourceAnswer):images[0];
+  if(!source)throw new Error('请提供来源链接，或上传邮件 / 通知截图。');
+  const patch={source};
   const field=get('更新字段');
   if(updating&&field) {
     const value=required('更新后的内容');
@@ -146,9 +149,14 @@ export function parseSubmission(issue,data) {
     const changed=Object.keys(patch).filter(key=>JSON.stringify(patch[key])!==JSON.stringify(existing[key]));
     if(changed.some(key=>!['source','registration','claimUrl','menuUrl','expiresOn','active'].includes(key))){patch.homeSummary=undefined;patch.search=undefined;patch.subtitle=undefined;}
     if(patch.source===existing.collectionSource)patch.source=existing.source;
-    else if(patch.source!==existing.source){patch.collectionSource=undefined;patch.sourceLabel=undefined;}
+    else if(patch.source!==existing.source){patch.collectionSource=undefined;patch.sourceLabel=undefined;patch.screenshot=undefined;}
   }
-  return {type,id:entryId || 'issue-'+issue.number,updating,patch,images,hash:submissionHash(issue)};
+  const sourceImages=imageLinks(sourceAnswer || '',false);
+  try{attachmentUrl(patch.source);sourceImages.push(patch.source);}catch{}
+  images=imageLinks([...images,...sourceImages].join('\n'));
+  const sourceImage=images.includes(patch.source)?patch.source:undefined;
+  if(sourceImage)attachmentUrl(sourceImage);
+  return {type,id:entryId || 'issue-'+issue.number,updating,patch,images,sourceImage,hash:submissionHash(issue)};
 }
 export function applySubmission(data,parsed,metadata) {
   const copy=structuredClone(data),items=copy[collections[parsed.type]];

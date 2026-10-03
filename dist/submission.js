@@ -77,9 +77,9 @@
     '</div>',
     '<div class="submission-fields submission-source">',
     input('expiresOn','展示截止日期',{type:'date',optional:true,full:true,help:'当天结束后退出首页推荐；长期内容可留空。'}),
-    input('source', '原始通知 / 来源链接', {type:'url', full:true, labelId:'entry-source-label', max:600, placeholder:'https://…', help:'官方页面、菜单、地图或公开通知均可。'}),
+    input('source', '来源链接', {type:'url', optional:true, full:true, labelId:'entry-source-label', max:600, placeholder:'https://…', help:'来源链接和通知截图至少提供一种。没有链接时，可在下方上传邮件或通知截图。'}),
     '</div>',
-    '<div class="submission-images"><label class="form-field"><span>配图 <b>可选</b></span><input type="file" id="submission-images" accept="image/png,image/jpeg,image/gif,image/webp" multiple disabled><small>最多 3 张，每张 5 MB。第一张作为封面，可拖入图片。</small></label><p id="image-feedback" class="submission-hint" role="status"></p><div id="image-list" class="submission-image-list"></div><div id="image-recovery" hidden><button type="button" class="text-link" id="retry-images">重试上传</button><button type="button" class="text-link" id="cancel-images">取消待上传</button></div></div>',
+    '<div class="submission-images"><label class="form-field"><span>配图 / 通知截图</span><input type="file" id="submission-images" accept="image/png,image/jpeg,image/gif,image/webp" multiple disabled><small>最多 3 张，每张 5 MB，第一张作为封面。没有来源链接时，请将通知截图放在第一张；上传前遮挡学号、邮箱等私人信息。</small></label><p id="image-feedback" class="submission-hint" role="status"></p><div id="image-list" class="submission-image-list"></div><div id="image-recovery" hidden><button type="button" class="text-link" id="retry-images">重试上传</button><button type="button" class="text-link" id="cancel-images">取消待上传</button></div></div>',
     '<label class="submission-consent"><input type="checkbox" name="publicConsent" required>我确认以上信息可公开展示，并已附上可核对的来源。</label>',
     '<div class="form-actions"><span>* 为必填项 · 请勿填写私人联系方式</span><button class="pill lime" type="submit">下一步：预览投稿</button></div></div>',
     '<section id="submission-preview" hidden aria-label="投稿预览"><div class="preview-summary" id="submission-summary"></div>',
@@ -129,10 +129,11 @@
   community.authControl(panel.querySelector('#submission-auth'),{action:'提交投稿',beforeLogin:saveDraft,onError:error=>feedback.textContent=error.message});
   community.subscribe(renderSession);
   function renderImages() {
+    if(images.length)form.elements.source.setCustomValidity('');
     imageList.replaceChildren();
     images.forEach((item,index)=>{
       const tile=document.createElement('figure');
-      tile.innerHTML='<img src="'+escape(item.previewUrl)+'" alt="投稿配图 '+(index+1)+'"><figcaption>'+(index===0?'封面':'配图 '+(index+1))+'<button type="button" class="text-link" aria-label="移除配图 '+(index+1)+'">移除</button></figcaption>';
+      tile.innerHTML='<img src="'+escape(item.previewUrl)+'" alt="投稿配图 '+(index+1)+'"><figcaption>'+(index===0?(form.elements.source.value.trim()?'封面':'封面 / 来源截图'):'配图 '+(index+1))+'<button type="button" class="text-link" aria-label="移除配图 '+(index+1)+'">移除</button></figcaption>';
       tile.querySelector('button').disabled=uploading;
       tile.querySelector('button').onclick=()=>{images.splice(index,1);renderImages();renderSession();saveDraft();};
       imageList.append(tile);
@@ -211,7 +212,8 @@
     for (const name of ['benefitStart','benefitEnd']) form.elements[name].disabled = !limited;
     panel.querySelector('#entry-title-label').textContent = ({event:'活动名称',benefit:'福利名称',notice:'提醒标题',food:'店名 / 餐厅名称'})[type] + ' *';
     panel.querySelector('#entry-description-label').textContent = ({event:'活动介绍',benefit:'福利内容',notice:'提醒内容',food:'推荐理由'})[type] + ' *';
-    panel.querySelector('#entry-source-label').textContent = type === 'food' ? '店铺 / 菜单 / 地图链接 *' : '原始通知 / 来源链接 *';
+    panel.querySelector('#entry-source-label').innerHTML = (type === 'food' ? '店铺 / 菜单 / 地图链接' : '来源链接') + ' <b>可选</b>';
+    renderImages();
   }
   function edit() {
     editor.hidden = false;
@@ -237,6 +239,7 @@
   });
   form.addEventListener('input', event => {
     if (typeof event.target.setCustomValidity === 'function') event.target.setCustomValidity('');
+    if(event.target.name==='source')renderImages();
     saveDraft();
   });
   function httpUrl(value) {
@@ -254,6 +257,7 @@
       const field = form.elements[name];
       if (!field.disabled && field.value.trim() && !httpUrl(field.value.trim())) field.setCustomValidity('请输入不含账号密码的完整 http:// 或 https:// 链接。');
     }
+    if(!form.elements.source.value.trim()&&!images.length)form.elements.source.setCustomValidity('请填写来源链接，或在下方上传邮件 / 通知截图。');
     for (const [startName,endName] of [['date','endDate'],['benefitStart','benefitEnd']]) {
       const start = form.elements[startName], end = form.elements[endName];
       if (!start.disabled && !end.disabled && start.value && end.value && end.value < start.value) end.setCustomValidity('结束日期不能早于开始日期。');
@@ -294,12 +298,13 @@
       summary.push(['适用对象 / 范围',values.noticeAudience],['生效或相关日期',values.noticeDate],['需要注意或做什么',values.noticeAction]);
     }
     if(values.expiresOn || (updating && values.validity!=='limited'))summary.push(['展示截止日期',values.expiresOn || '清空']);
-    summary.push(['来源',values.source.trim()]);
+    const sourceUrl=values.source.trim();
+    summary.push(['来源',sourceUrl || images[0].url]);
     const prefix = {event:'活动',benefit:'福利',notice:'提醒',food:'美食'}[type];
     const issueTitle = '[' + prefix + (updating ? '更新' : '投稿') + '] ' + title;
     const valueOf = value => String(value || '未提供').trim();
     markdown = '## ' + issueTitle + '\n\n' + summary.map(([label,value]) => '### ' + label + '\n' + valueOf(value) + '\n').join('\n') + '\n### 配图\n' + images.map((image,index)=>'![配图 '+(index+1)+']('+image.url+')').join('\n') + '\n\n---\n- [x] 信息及配图可公开展示，已附可核对的来源。\n' + baseMarker;
-    panel.querySelector('#submission-summary').innerHTML = '<h3>' + escape(title) + '</h3>'+ (images.length?'<div class="submission-image-list preview-images">'+images.map((image,i)=>'<img src="'+escape(image.previewUrl)+'" alt="投稿配图 '+(i+1)+'">').join('')+'</div>':'')+'<dl class="submission-summary-facts">' + summary.filter(([label,value]) => label !== '条目 ID' && String(value || '').trim()).map(([label,value]) => '<dt>' + escape(label) + '</dt><dd>' + escape(valueOf(value)) + '</dd>').join('') + '</dl>';
+    panel.querySelector('#submission-summary').innerHTML = '<h3>' + escape(title) + '</h3>'+ (images.length?'<div class="submission-image-list preview-images">'+images.map((image,i)=>'<img src="'+escape(image.previewUrl)+'" alt="投稿配图 '+(i+1)+'">').join('')+'</div>':'')+'<dl class="submission-summary-facts">' + summary.filter(([label,value]) => label !== '条目 ID' && String(value || '').trim()).map(([label,value]) => '<dt>' + escape(label) + '</dt><dd>' + escape(label==='来源'&&!sourceUrl?'通知截图（第一张配图）':valueOf(value)) + '</dd>').join('') + '</dl>';
     if(!prepared || prepared.title!==issueTitle || prepared.body!==markdown)prepared={title:issueTitle,body:markdown,requestId:crypto.randomUUID()};
     editor.hidden = true;
     preview.hidden = false;
